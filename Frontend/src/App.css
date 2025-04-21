@@ -1,0 +1,175 @@
+*{
+    box-sizing: border-box;
+}
+.landingPageContainer{
+    width: 100vw;
+    height: 100vh;
+    background: url("media/images/background2.png");
+    background-repeat: no-repeat;
+    color: white;
+    background-size: cover;
+    overflow-y: scroll;
+}
+
+/* Scrollbar track (background of the scrollbar) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 5px;
+  }
+  
+  /* Scrollbar thumb (the draggable part of the scrollbar) */
+  ::-webkit-scrollbar-thumb {
+    background-color: #D97500;
+    border-radius: 10px;
+  }
+  
+  /* Scrollbar thumb on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #B76F00;
+  }
+  
+  /* Scrollbar track (optional) */
+  ::-webkit-scrollbar-track {
+    background-color: #1a1a1a; /* Dark background */
+    border-radius: 10px;
+  }
+  
+
+.landingPageContainer nav{
+    padding:1.2rem 1.6rem ;
+    /* display: flex;
+    align-items: center;
+    justify-content: space-between; */
+}
+
+.landingPageContainer nav h2{
+    font-size: 1.8rem;
+    font-weight: 500;
+}
+.landingPageContainer nav .navlist{
+    display: flex;
+    gap: 1.6rem;
+    cursor: pointer;
+}
+.landingMainContainer{
+    height: 80vh;
+}
+.landingMainContainer > div:nth-child(1) div[role="button"]{
+    width: fit-content;
+    background-color: #D97500;
+    padding-inline: 1rem;
+}
+/* login btn */
+/* From Uiverse.io by SupportHotline */ 
+.login-btn {
+    background: var(--color-back);
+    border-radius: 0.5em;
+    box-shadow:
+      inset 0px -6px 18px -6px rgba(217, 117, 0, 0),
+      inset rgba(217, 117, 0, 1) -1px -1px 6px 0px,
+      inset 12px 0px 12px -6px rgba(217, 117, 0, 0),
+      inset -12px 0px 12px -6px rgba(217, 117, 0, 0),
+      rgba(217, 117, 0, 1) -1px -1px 6px 0px;
+    border: solid 2px #030f14;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0.7em 1.7em;
+    outline: none;
+    transition: all 0.3s;
+    user-select: none;
+  }
+  
+  .login-btn:hover {
+    box-shadow:
+      inset 0px -6px 18px -6px rgba(217, 117, 0, 1),
+      inset 0px 6px 18px -6px rgba(217, 117, 0, 1),
+      inset 12px 0px 12px -6px rgba(217, 117, 0, 0),
+      inset -12px 0px 12px -6px rgba(217, 117, 0, 0),
+      -1px -1px 6px 0px rgba(217, 117, 0, 1);
+  }
+  
+  .login-btn:active {
+    box-shadow:
+      inset 0px -12px 12px -6px rgba(217, 117, 0, 1),
+      inset 0px 12px 12px -6px rgba(217, 117, 0, 1),
+      inset 12px 0px 12px -6px rgba(217, 117, 0, 1),
+      inset -12px 0px 12px -6px rgba(217, 117, 0, 1),
+      -1px -1px 6px 0px rgba(217, 117, 0, 1);
+  }
+  
+  .text {
+    color: white;
+    font-weight: 700;
+    margin: auto;
+    transition: all 0.3s;
+    width: fit-content;
+  }
+  
+  .login-btn:hover .text {
+    transform: scale(0.9);
+  }
+  
+  .login-btn:active .text {
+    transform: scale(0.8);
+  }
+  .btn-shine {
+    padding: 12px 48px;
+    color: #fff;
+    background: linear-gradient(to right, #9f9f9f 0, #fff 10%, #868686 20%);
+    background-position: 0;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s infinite linear;
+    animation-fill-mode: forwards;
+    -webkit-text-size-adjust: none;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    white-space: nowrap;
+    font-family: "Poppins", sans-serif;
+  }
+  @-moz-keyframes shine {
+    0% {
+      background-position: 0;
+    }
+    60% {
+      background-position: 180px;
+    }
+    100% {
+      background-position: 180px;
+    }
+  }
+  @-webkit-keyframes shine {
+    0% {
+      background-position: 0;
+    }
+    60% {
+      background-position: 180px;
+    }
+    100% {
+      background-position: 180px;
+    }
+  }
+  @-o-keyframes shine {
+    0% {
+      background-position: 0;
+    }
+    60% {
+      background-position: 180px;
+    }
+    100% {
+      background-position: 180px;
+    }
+  }
+  @keyframes shine {
+    0% {
+      background-position: 0;
+    }
+    60% {
+      background-position: 180px;
+    }
+    100% {
+      background-position: 180px;
+    }
+  }
+  

@@ -1,0 +1,60 @@
+/* From Uiverse.io by alexruix */ 
+.info-card{
+    width: 190px;
+    height: 254px;
+    background: linear-gradient(135deg, #342d4e, rgb(183, 111, 0));
+    position: relative;
+    color: white;
+    border-radius: 1.25rem;
+    padding: 1.8rem;
+    border: 2px solid #342d4e;
+    transition: 0.5s ease-out;
+    overflow: visible;
+    
+   }
+   .info-card-details {
+    color: black;
+    height: 100%;
+    gap: .5em;
+    display: grid;
+    place-content: center;
+   }
+   
+   .info-card-button {
+    transform: translate(-50%, 125%);
+    width: 60%;
+    border-radius: 1rem;
+    border: none;
+    background-color: #008bf8;
+    color: #fff;
+    font-size: 1rem;
+    padding: .5rem 1rem;
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    opacity: 0;
+    transition: 0.3s ease-out;
+   }
+   
+   .info-card-body {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+   }
+   
+   /*Text*/
+   .info-card-title {
+    color: white;
+    font-size: 1.5em;
+    font-weight: 00;
+   }
+   
+   /*Hover*/
+   .info-card:hover {
+    border-color: #008bf8;
+    box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.25);
+   }
+   
+   .info-card:hover .info-card-button {
+    transform: translate(-50%, 50%);
+    opacity: 1;
+   }
