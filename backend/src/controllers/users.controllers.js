@@ -32,13 +32,16 @@ const login = async(req, res)=>{
     const user = await User.findOne({username});
 
     if(!user){
-        res.status(httpstatus.NOT_FOUND).json({message: "Invalid username or password"});
+        res.status(httpstatus.NOT_FOUND).json({message: "User not found"});
     }
-    if(brycpt.compare(password, user.password)){
+    const isPassword =  await brycpt.compare(password, user.password)
+    if(isPassword){
         let token = crypto.randomBytes(20).toString("hex");
         user.token = token;
         await user.save();
         return res.status(httpstatus.OK).json({token: token})
+    }else{
+        res.status(httpstatus.UNAUTHORIZED).json({message: "Invalid username or password"})
     }
     
 }

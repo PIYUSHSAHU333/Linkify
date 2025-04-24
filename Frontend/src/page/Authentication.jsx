@@ -1,23 +1,67 @@
 import React, { useState } from "react";
-
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 function Authentication() {
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [username, setusername] = useState("");
   const [error, setError] = useState("");
   const [formState, setFormState] = useState(0); //0 => sign-in & 1 =>sign-up
   const [message, setMessage] = useState("");
   const [snackbar, setSnackbar] = useState("");
+  const [open, setOpen] = useState("");
+
+  const authContext = useContext(AuthContext);
+  const { handleRegister, handleLogin } = authContext;
+  const handleAuth = async () => {
+    try {
+      if (formState === 0) {
+        const result = await handleLogin(username, password);
+        console.log(result);
+        setMessage(result);
+        setSnackbar("Login Successful");
+        setTimeout(()=>{
+          setSnackbar("")
+        }, 5000)
+        setError("");
+        setPassword("");
+        setusername("")
+      }
+      if (formState === 1) {
+        const result = await handleRegister(username, name, password);
+        console.log(result);
+        setMessage(result);
+        setSnackbar("User registered")
+        setTimeout(()=>{
+          setSnackbar("")
+        }, 5000)
+        setPassword("");
+        setError("")
+        setFormState(0)
+      }
+    } catch (err) {
+      console.log(err, "<=error")
+      console.log(err.response.data.message)
+      setError(err.response.data.message);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim() || !username.trim()) {
-      setSnackbar("Email,Password and username are required!");
-      setTimeout(() => setSnackbar(""), 3000); // Hide after 3s
-      return;
+    if (formState === 0) {
+      if (!password.trim() || !username.trim()) {
+        setSnackbar("username and password are required!");
+        setTimeout(() => setSnackbar(""), 3000); // Hide after 3s
+        return;
+      }
+    } else if (formState === 1) {
+      if (!name.trim() || !password.trim() || !username.trim()) {
+        setSnackbar("Email, password and username are required!");
+        setTimeout(() => setSnackbar(""), 3000); // Hide after 3s
+        return;
+      }
     }
-
-    //s Do login stuff
+    handleAuth();
   };
 
   return (
@@ -49,8 +93,8 @@ function Authentication() {
         <br />
         {formState === 1 ? (
           <div class="input_container">
-            <label class="input_label" for="email_field">
-              Email
+            <label class="input_label" for="name_field">
+              Name
             </label>
             <svg
               fill="none"
@@ -64,25 +108,26 @@ function Authentication() {
                 stroke-linejoin="round"
                 stroke-linecap="round"
                 stroke-width="1.5"
-                stroke="#141B34"
-                d="M7 8.5L9.94202 10.2394C11.6572 11.2535 12.3428 11.2535 14.058 10.2394L17 8.5"
-              ></path>
+                stroke="#000000"
+                d="M15.232 5.232l3.536 3.536"
+              />
               <path
                 stroke-linejoin="round"
+                stroke-linecap="round"
                 stroke-width="1.5"
-                stroke="#141B34"
-                d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.7551 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.7551 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09882 3.53656C5.95033 3.61566 4.37608 3.65521 3.24495 4.79065C2.11382 5.92608 2.08114 7.45885 2.01576 10.5244C1.99474 11.5101 1.99475 12.4899 2.01577 13.4756Z"
-              ></path>
+                stroke="#000000"
+                d="M4 20h4l10.293-10.293a1 1 0 000-1.414l-2.586-2.586a1 1 0 00-1.414 0L4 16v4z"
+              />
             </svg>
             <input
-              placeholder="name@mail.com"
+              placeholder="Full name"
               title="Inpit title"
               name="input-name"
               type="text"
               class="input_field"
-              id="email_field"
-              onChange={(e) => setEmail(e.target.value)}
-              value={email}
+              id="name_field"
+              onChange={(e) => setName(e.target.value)}
+              value={name}
             />
           </div>
         ) : (
@@ -90,7 +135,7 @@ function Authentication() {
         )}
 
         <div class="input_container">
-          <label class="input_label" for="email_field">
+          <label class="input_label" for="username_field">
             Username
           </label>
           <svg
@@ -122,7 +167,7 @@ function Authentication() {
             name="input-name"
             type="text"
             class="input_field"
-            id="email_field"
+            id="username_field"
             onChange={(e) => setusername(e.target.value)}
             value={username}
           />
@@ -168,6 +213,7 @@ function Authentication() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+        <p style={{ color: "red" }}>{error}</p>
         <button
           title="Sign In"
           type="submit"
@@ -176,7 +222,6 @@ function Authentication() {
         >
           <span>{formState === 0 ? "Signin" : "Signup"}</span>
         </button>
-
         <div class="separator"></div>
       </form>
 
