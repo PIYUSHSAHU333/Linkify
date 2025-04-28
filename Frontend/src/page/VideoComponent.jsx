@@ -27,21 +27,63 @@ function VideoMeetingComponent() {
   let localVideoRef = useRef();
   var socketRef = useRef();
   let socketIdRef = useRef();
-  const videoRef = useRef([])
+  const videoRef = useRef([]);
   let connect = () => {
     setAskForUsername(false);
     getMedia();
   };
 
+  const gotMsgFromServer = (fromId, message) => {
+    var signal = JSON.parse(message);
+
+    if (fromId !== socketIdRef.current) {
+      if (signal.sdp) {
+        connections[fromId]
+          .setRemoteDescription(new RTCSessionDescription(signal.sdp))
+          .then(() => {
+            if (signal.sdp.type == "offer") {
+              connections[fromId]
+                .createAnswer()
+                .then((description) => {
+                  connections[fromId]
+                    .setLocalDescription(description)
+                    .then(() => {
+                      socketRef.current.emit(
+                        "signal",
+                        fromId,
+                        JSON.stringify({
+                          sdp: connections[fromId].localDescription,
+                        })
+                      );
+                    })
+                    .catch((e) => {
+                      console.log(e);
+                    });
+                })
+                .catch((e) => {
+                  console.log(e);
+                });
+            }
+          })
+          .catch((e) => console.log(e));
+      }
+      if (signal.ice) {
+        connections[fromId]
+          .addIceCandidate(new RTCIceCandidate(signal.ice))
+          .catch((e) => console.log(e));
+      }
+    }
+  };
+
   let connectToSocketServer = async () => {
-    socketRef.current = io.connect("http://localhost:8080", { secure: false }); //represents client side socket connection
+    socketRef.current = io.connect("http://localhost:8080", { secure: false }); //represents client side socket connection (current)
 
     socketRef.current.on("signal", gotMsgFromServer);
 
     socketRef.current.on("connect", () => {
       socketRef.current.emit("join-call", window.location.href);
 
-      socketIdRef.current = socketRef.current.id; //socket id that we get for each client on connection with server
+      socketIdRef.current = socketRef.current.id; //socket id that we get for each client on connection with server given by socket.io (so socketIdRef is the id of curr user)
 
       socketRef.current.on("chat-message", addMessage);
 
@@ -53,44 +95,78 @@ function VideoMeetingComponent() {
       socketRef.current.on("user-joined", (socketId, clients) => {
         clients.forEach((socketListId) => {
           connections[socketListId] = new RTCPeerConnection( //new connected user is making peerConnection with other laready existing clients (or users) in the room
-            peerConfigConnections 
-          );
+            peerConfigConnections
+          ); //!!!???doubtToBeAsked!!!???
 
-          connections[socketListId].onicecandidate = (event) => { //.onicecandidate is an event that is triggered when ice candidate (ask chatGpt) is found for any peer
-            if (event.candidate != null) {  
+          connections[socketListId].onicecandidate = (event) => {
+            //.onicecandidate is an event that is triggered when ice candidate (ask chatGpt) is found for any peer
+            if (event.candidate != null) {
               socketRef.current.emit(
                 "signal",
                 socketListId,
-                JSON.stringify({ 'ice': event.candidate }) // We're sending ICE info to the other peer so they can use it to establish a direct connection with us.
-
+                JSON.stringify({ ice: event.candidate }) // We're sending ICE info to the other peer so they can use it to establish a direct connection with us.
               );
             }
           };
 
-          connections[socketListId].onaddstream = (event)=>{
-            let videoExists = videoRef.current.find(video=>video.socketId === socketListId);
+          connections[socketListId].onaddstream = (event) => {
+            let videoExists = videoRef.current.find(
+              (video) => video.socketId === socketListId
+            );
             //checking if some user b and c are already connected to us but maybe sending new stream bc of refresh, connecctivity issue etc
-            if(videoExists){
-              setVideo(videos => {
-                const updatedVideos = videos.map(video =>
-                  video.socketId === socketListId ? {...video, stream: event.stream} : video
+            if (videoExists) {
+              setVideo((videos) => {
+                const updatedVideos = videos.map((video) =>
+                  video.socketId === socketListId
+                    ? { ...video, stream: event.stream }
+                    : video
                 );
                 return updatedVideos;
-              })
-            }else{
+              });
+            } else {
               //if they are sending their stream for first time then we'll create new video obj of then in our videos
               let newVideo = {
                 socketId: socketListId,
-                stream: event.stream, 
+                stream: event.stream,
                 autoplay: true, // Auto-play the video as soon as it’s added
-                playsinline: true  //is useful for mobile devices to play video inline (not full screen)
-              }
+                playsinline: true, //is useful for mobile devices to play video inline (not full screen)
+              };
 
-              setVideo(videos => {
+              setVideo((videos) => {
                 const updatedVideos = [...videos, newVideo];
                 videoRef.current = updatedVideos;
-                return updatedVideos
-              })
+                return updatedVideos;
+              });
+            }
+          };
+
+          if (window.localStream != undefined && window.localStream != null) {
+            connections[socketListId].addStream(window.localStream);
+          } else {
+            //TODO BLACKSILENCE
+          }
+
+          if (socketId === socketIdRef.current) {
+            //if current user is the one just joined, bc for other user(eg: B) socketId would be of A who just joined but socketIdRef would be own socket id
+            for (let id2 in connections) {
+              //id2 is representing other users in the connections obj
+              if (id2 === socketIdRef.current) continue; //if the loop iterate over me then obv i wont connect to myself so skip
+
+              try {
+                connections[id2].addStream(window.localStream);
+              } catch (e) {}
+              connections[id2].createOffer().then((description) => {
+                connections[id2]
+                  .setLocalDescription(description)
+                  .then(() => {
+                    socketRef.current.emit(
+                      "signal",
+                      id2,
+                      JSON.stringify({ sdp: connections[id2].localDescription })
+                    );
+                  })
+                  .catch((e) => console.log(e));
+              });
             }
           }
         });
@@ -178,6 +254,55 @@ function VideoMeetingComponent() {
     getPermission();
   }, []);
 
+  let getUserMediaSuccess = (stream) => {
+    try {
+        window.localStream.getTracks().forEach(track => track.stop())
+    } catch (e) { console.log(e) }
+
+    window.localStream = stream
+    localVideoref.current.srcObject = stream
+
+    for (let id in connections) {
+        if (id === socketIdRef.current) continue
+
+        connections[id].addStream(window.localStream)
+
+        connections[id].createOffer().then((description) => {
+            console.log(description)
+            connections[id].setLocalDescription(description)
+                .then(() => {
+                    socketRef.current.emit('signal', id, JSON.stringify({ 'sdp': connections[id].localDescription }))
+                })
+                .catch(e => console.log(e))
+        })
+    }
+
+    stream.getTracks().forEach(track => track.onended = () => {
+        setVideo(false);
+        setAudio(false);
+
+        try {
+            let tracks = localVideoref.current.srcObject.getTracks()
+            tracks.forEach(track => track.stop())
+        } catch (e) { console.log(e) }
+
+        let blackSilence = (...args) => new MediaStream([black(...args), silence()])
+        window.localStream = blackSilence()
+        localVideoref.current.srcObject = window.localStream
+
+        for (let id in connections) {
+            connections[id].addStream(window.localStream)
+
+            connections[id].createOffer().then((description) => {
+                connections[id].setLocalDescription(description)
+                    .then(() => {
+                        socketRef.current.emit('signal', id, JSON.stringify({ 'sdp': connections[id].localDescription }))
+                    })
+                    .catch(e => console.log(e))
+            })
+        }
+    })
+}
   return (
     <>
       <div>
