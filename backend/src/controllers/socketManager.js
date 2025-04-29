@@ -82,7 +82,7 @@ export const connectToSocket = (server) => {
         JSON.stringify(Object.entries(connections)) //deep copy of connections object
       )) {
         for (let a = 0; a < clients.length; ++a) {
-          if (v[a] === socket.id) {
+          if (room[a] === socket.id) {
             key = room;
 
             for (let a = 0; connections[key].length; ++a) {

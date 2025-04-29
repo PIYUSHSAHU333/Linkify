@@ -143,7 +143,9 @@ function VideoMeetingComponent() {
           if (window.localStream != undefined && window.localStream != null) {
             connections[socketListId].addStream(window.localStream);
           } else {
-            //TODO BLACKSILENCE
+            let blackSilence = (...args) => new MediaStream([black(...args), silence()])
+            window.localStream = blackSilence()
+            connections[socketListId].addStream(window.localStream)
           }
 
           if (socketId === socketIdRef.current) {
@@ -229,7 +231,7 @@ function VideoMeetingComponent() {
     if ((video && videoAvailable) || (audio && audioAvailable)) {
       navigator.mediaDevices
         .getUserMedia({ video: video, audio: audio })
-        .then(() => {})
+        .then(getUserMediaSuccess)
         .then((stream) => {})
         .catch((e) => {
           console.log(e);
@@ -256,53 +258,100 @@ function VideoMeetingComponent() {
 
   let getUserMediaSuccess = (stream) => {
     try {
-        window.localStream.getTracks().forEach(track => track.stop())
-    } catch (e) { console.log(e) }
-
-    window.localStream = stream
-    localVideoref.current.srcObject = stream
-
-    for (let id in connections) {
-        if (id === socketIdRef.current) continue
-
-        connections[id].addStream(window.localStream)
-
-        connections[id].createOffer().then((description) => {
-            console.log(description)
-            connections[id].setLocalDescription(description)
-                .then(() => {
-                    socketRef.current.emit('signal', id, JSON.stringify({ 'sdp': connections[id].localDescription }))
-                })
-                .catch(e => console.log(e))
-        })
+      window.localStream.getTracks().forEach((track) => track.stop());
+    } catch (e) {
+      console.log(e);
     }
 
-    stream.getTracks().forEach(track => track.onended = () => {
-        setVideo(false);
-        setAudio(false);
+    window.localStream = stream;
+    localVideoRef.current.srcObject = stream;
 
-        try {
-            let tracks = localVideoref.current.srcObject.getTracks()
-            tracks.forEach(track => track.stop())
-        } catch (e) { console.log(e) }
+    for (let id in connections) {
+      if (id === socketIdRef.current) continue;
 
-        let blackSilence = (...args) => new MediaStream([black(...args), silence()])
-        window.localStream = blackSilence()
-        localVideoref.current.srcObject = window.localStream
+      connections[id].addStream(window.localStream);
 
-        for (let id in connections) {
-            connections[id].addStream(window.localStream)
+      connections[id].createOffer().then((description) => {
+        console.log(description);
+        connections[id]
+          .setLocalDescription(description)
+          .then(() => {
+            socketRef.current.emit(
+              "signal",
+              id,
+              JSON.stringify({ sdp: connections[id].localDescription })
+            );
+          })
+          .catch((e) => console.log(e));
+      });
+    }
+
+    stream.getTracks().forEach(
+      (track) =>
+        (track.onended = () => {
+          setVideo(false);
+          setAudio(false);
+
+          try {
+            let tracks = localVideoRef.current.srcObject.getTracks();
+            tracks.forEach((track) => track.stop());
+          } catch (e) {
+            console.log(e);
+          }
+
+          let blackSilence = (...args) =>
+            new MediaStream([black(...args), silence()]);
+          window.localStream = blackSilence();
+          localVideoRef.current.srcObject = window.localStream;
+
+          for (let id in connections) {
+            connections[id].addStream(window.localStream);
 
             connections[id].createOffer().then((description) => {
-                connections[id].setLocalDescription(description)
-                    .then(() => {
-                        socketRef.current.emit('signal', id, JSON.stringify({ 'sdp': connections[id].localDescription }))
-                    })
-                    .catch(e => console.log(e))
-            })
-        }
-    })
-}
+              connections[id]
+                .setLocalDescription(description)
+                .then(() => {
+                  socketRef.current.emit(
+                    "signal",
+                    id,
+                    JSON.stringify({ sdp: connections[id].localDescription })
+                  );
+                })
+                .catch((e) => console.log(e));
+            });
+          }
+        })
+    );
+  };
+
+  let silence = () => {
+    //ask GPt on any confusion
+    let ctx = new AudioContext(); //creates a container for all sound activity to be happened in that box
+    let oscillator = ctx.createOscillator(); //this simply means creating different sound(not creating rn, it'll happen with oscillator.start())
+    let dst = oscillator.connect(ctx.createMediaStreamDestination()); //this simply means converting that sound to a media stream
+    oscillator.start(); //creating sound
+    ctx.resume(); // un-pausing the sound(bc by default in an audio context browser mutes sound)
+    return Object.assign(dst.stream.getAudioTracks()[0], { enabled: false }); //getting the created audio track from obj=>dst.stream.getAudioTracks()[0] this is an object we then copy it's property through object.assign and assign one more property that is enabled: false which means mute
+  };
+  let black = ({ width = 640, height = 480 } = {}) => {
+    //pretty easy
+    let canvas = Object.assign(document.createElement("canvas"), {
+      width,
+      height,
+    }); //creating a canvas and also assigning some height and width to it
+    let stream = canvas.captureStream(); //It's like recording whatever is there on canvas and storing it in stream(canvas.captureStream() return object)
+    return Object.assign(stream.getVideoTracks()[0], { enabled: false }); //assigning that object 'stream.getVideoTracks()[0]' enabled:false to mute the stream
+  };
+  const addMessage = (data, sender, socketIdSender) => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: sender, data: data },
+    ]);
+    if (socketIdSender !== socketIdRef.current) {
+      setNewMessages((prevNewMessages) => prevNewMessages + 1);
+    }
+  };
+
   return (
     <>
       <div>
@@ -326,9 +375,11 @@ function VideoMeetingComponent() {
               <video ref={localVideoRef} autoPlay muted></video>
             </div>
           </div>
-        ) : (
-          ""
-        )}
+        ) : 
+        <div>
+          <video ref={localVideoRef} autoPlay muted></video>
+        </div>
+        }
       </div>
     </>
   );
