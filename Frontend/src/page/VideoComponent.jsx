@@ -9,7 +9,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
-import styles from "../Styles/VideoComponent.module.css"
+import styles from "../Styles/VideoComponent.module.css";
 import io from "socket.io-client";
 
 var connections = {};
@@ -36,55 +36,82 @@ function VideoMeetingComponent() {
   let [newMessages, setNewMessages] = useState(3);
   const [showModal, setShowModal] = useState(true);
   let [messages, setMessages] = useState([]);
+  let [screen, setScreen] = useState();
   let [message, setMessage] = useState("");
-  let [videos, setVideos] = useState([])
+  let [videos, setVideos] = useState([]);
   let localVideoRef = useRef();
   var socketRef = useRef();
   let socketIdRef = useRef();
   const videoRef = useRef([]);
   let connect = () => {
+    localStorage.setItem("username", username);
     setAskForUsername(false);
     getMedia();
   };
 
-  
   let getDislayMedia = () => {
     if (screen) {
-        if (navigator.mediaDevices.getDisplayMedia) {
-            navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
-                .then(getDislayMediaSuccess)
-                .then((stream) => { })
-                .catch((e) => console.log(e))
-        }
+      if (navigator.mediaDevices.getDisplayMedia) {
+        navigator.mediaDevices
+          .getDisplayMedia({ video: true })
+          .then(getDislayMediaSuccess)
+          .then((stream) => {})
+          .catch((e) => console.log(e));
+      }
     }
-}
- 
-let getDislayMediaSuccess = (stream) => {
-  console.log("HERE")
-  try {
-      window.localStream.getTracks().forEach(track => track.stop())
-  } catch (e) { console.log(e) }
+  };
 
-  window.localStream = stream
-  localVideoref.current.srcObject = stream
+  let getDislayMediaSuccess = (stream) => {
+    stream.getTracks().forEach(
+      (track) =>
+        (track.onended = () => {
+          setScreen(false);
 
-  for (let id in connections) {
-      if (id === socketIdRef.current) continue
+          try {
+            let tracks = localVideoRef.current.srcObject.getTracks();
+            tracks.forEach((track) => track.stop());
+          } catch (e) {
+            console.log(e);
+          }
 
-      connections[id].addStream(window.localStream)
+          let blackSilence = (...args) =>
+            new MediaStream([black(...args), silence()]);
+          window.localStream = blackSilence();
+          localVideoRef.current.srcObject = window.localStream;
+
+          getUserMedia();
+        })
+    );
+
+    console.log("HERE");
+    try {
+      window.localStream.getTracks().forEach((track) => track.stop());
+    } catch (e) {
+      console.log(e);
+    }
+
+    window.localStream = stream;
+    localVideoRef.current.srcObject = stream;
+
+    for (let id in connections) {
+      if (id === socketIdRef.current) continue;
+
+      connections[id].addStream(window.localStream);
 
       connections[id].createOffer().then((description) => {
-          connections[id].setLocalDescription(description)
-              .then(() => {
-                  socketRef.current.emit('signal', id, JSON.stringify({ 'sdp': connections[id].localDescription }))
-              })
-              .catch(e => console.log(e))
-      })
-  }
-
-  stream.getTracks().forEach(track => track.onended = () => {
-  })
-}
+        connections[id]
+          .setLocalDescription(description)
+          .then(() => {
+            socketRef.current.emit(
+              "signal",
+              id,
+              JSON.stringify({ sdp: connections[id].localDescription })
+            );
+          })
+          .catch((e) => console.log(e));
+      });
+    }
+  };
 
   const gotMsgFromServer = (fromId, message) => {
     var signal = JSON.parse(message);
@@ -141,9 +168,13 @@ let getDislayMediaSuccess = (stream) => {
       socketRef.current.on("chat-message", addMessage);
 
       socketRef.current.on("user-left", (id) => {
-        setVideo((prevVideo) =>
+        setVideos((prevVideo) =>
           prevVideo.filter((video) => video.SocketId !== id)
         ); //we're filtering out video of that user which has left, also used callback as we need most recent value array, if many users left at same time then react can batch up the setVideo and will not give us most recent array but we need most recent array so callback func as here our new array value depends on previous
+        connections[id].close();
+        delete connections[id];
+
+        const videoEl = document.getElementById();
       });
       socketRef.current.on("user-joined", (socketId, clients) => {
         clients.forEach((socketListId) => {
@@ -168,7 +199,7 @@ let getDislayMediaSuccess = (stream) => {
             );
             //checking if some user b and c are already connected to us but maybe sending new stream bc of refresh, connecctivity issue etc
             if (videoExists) {
-              setVideo((videos) => {
+              setVideos((videos) => {
                 const updatedVideos = videos.map((video) =>
                   video.socketId === socketListId
                     ? { ...video, stream: event.stream }
@@ -185,7 +216,7 @@ let getDislayMediaSuccess = (stream) => {
                 playsinline: true, //is useful for mobile devices to play video inline (not full screen)
               };
 
-              setVideo((videos) => {
+              setVideos((videos) => {
                 const updatedVideos = [...videos, newVideo];
                 videoRef.current = updatedVideos;
                 return updatedVideos;
@@ -282,10 +313,13 @@ let getDislayMediaSuccess = (stream) => {
   };
 
   useEffect(() => {
-    if (video != undefined && audio != undefined) {
-      getUserMedia();
-      console.log("SET STATE HAS", video, audio);
+    if(screen !== true){
+      if (video != undefined && audio != undefined) {
+        getUserMedia();
+        console.log("SET STATE HAS", video, audio);
+      }
     }
+    
   }, [video, audio]);
 
   let getUserMedia = () => {
@@ -415,38 +449,85 @@ let getDislayMediaSuccess = (stream) => {
   };
 
   let sendMessage = () => {
-    console.log("Send message")
+    console.log("Send message");
     console.log(socketRef.current);
-    socketRef.current.emit('chat-message', message, username)
+    socketRef.current.emit("chat-message", message, username);
     setMessage("");
 
     // this.setState({ message: "", sender: username })
+  };
+
+  let handleVideo = () => {
+    setVideo(!video);
+    // getUserMedia();
+  };
+  let handleAudio = () => {
+    setAudio(!audio);
+    // getUserMedia();
+  };
+  let handleEndCall = () => {
+    try {
+      let tracks = localVideoRef.current.srcObject.getTracks();
+      tracks.forEach((track) => track.stop());
+    } catch (e) {}
+    window.location.href = "/";
+  };
+  let handleScreen = async() => {
+    if(!screen){ //for case when we want to screen share but if on being asked for permission we click on cancel
+      try{
+        if(await navigator.mediaDevices.getDisplayMedia({video:true, audio: true})){
+          setScreen(true)
+        }
+      }catch(e){}
+      
+    }else{
+      setScreen(false);
+    }
+    
+    
 }
 
-let handleVideo = () => {
-  setVideo(!video);
-  // getUserMedia();
-}
-let handleAudio = () => {
-  setAudio(!audio)
-  // getUserMedia();
-}
-let handleEndCall = () => {
-  try {
-      let tracks = localVideoref.current.srcObject.getTracks()
-      tracks.forEach(track => track.stop())
-  } catch (e) { }
-  window.location.href = "/"
-}
-let handleScreen = () => {
-  setScreen(!screen);
-}
-
-useEffect(() => {
-  if (screen !== undefined) {
+  useEffect(() => {
+    if (screen == true) {
       getDislayMedia();
-  }
-}, [screen])
+    } else if (screen == false) {
+      stopScreenShare();
+    }
+  }, [screen]);
+
+  const stopScreenShare = () => {
+    setScreen(false);
+
+    try {
+      let tracks = localVideoRef.current.srcObject.getTracks();
+      tracks.forEach((track) => {
+        track.stop();
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
+    let blackSilence = (...args) => {
+      new MediaStream([black(...args), silence()]);
+    };
+    window.localStream = blackSilence();
+
+    localVideoRef.current.srcObject = window.localStream;
+
+    getUserMedia();
+  };
+
+  let openChat = () => {
+    setShowModal(true);
+    setNewMessages(0);
+  };
+  let closeChat = () => {
+    setShowModal(false);
+  };
+  let handleMessage = (e) => {
+    setMessage(e.target.value);
+  };
+
   return (
     <>
       <div>
@@ -481,8 +562,6 @@ useEffect(() => {
                     {messages.length !== 0 ? (
                       messages.map((item, index) => {
                         console.log(message);
-
-                        
 
                         return (
                           <div style={{ marginBottom: "20px" }} key={index}>
@@ -539,7 +618,7 @@ useEffect(() => {
 
               <Badge badgeContent={newMessages} max={999} color="orange">
                 <IconButton
-                  onClick={() => setModal(!showModal)}
+                  onClick={() => setShowModal(!showModal)}
                   style={{ color: "white" }}
                 >
                   <ChatIcon />{" "}
