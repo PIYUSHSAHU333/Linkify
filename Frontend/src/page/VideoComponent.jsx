@@ -28,6 +28,7 @@ const peerConfigConnections = {
 function VideoMeetingComponent() {
   const [askForUsername, setAskForUsername] = useState(true);
   const [username, setUsername] = useState("");
+  const [otherUsernames, setOtherUsernames] = useState({});
   const [videoAvailable, setVideoAvailable] = useState(); //this represents our permission of video or audio from our device
   const [audioAvailable, setAudioAvailable] = useState();
   const [audio, setAudio] = useState(); //this represent multiple streams from other users
@@ -44,7 +45,6 @@ function VideoMeetingComponent() {
   let socketIdRef = useRef();
   const videoRef = useRef([]);
   let connect = () => {
-    localStorage.setItem("username", username);
     setAskForUsername(false);
     getMedia();
   };
@@ -161,7 +161,13 @@ function VideoMeetingComponent() {
     socketRef.current.on("signal", gotMsgFromServer);
 
     socketRef.current.on("connect", () => {
-      socketRef.current.emit("join-call", window.location.href);
+      socketRef.current.emit("join-call", window.location.href, username);
+      socketRef.current.on("username", (userId, username) => {
+        setOtherUsernames((latestOtherUsername) => ({
+          ...latestOtherUsername,
+          [userId]: username,
+        }));
+      });
 
       socketIdRef.current = socketRef.current.id; //socket id that we get for each client on connection with server given by socket.io (so socketIdRef is the id of curr user)
 
@@ -173,8 +179,6 @@ function VideoMeetingComponent() {
         ); //we're filtering out video of that user which has left, also used callback as we need most recent value array, if many users left at same time then react can batch up the setVideo and will not give us most recent array but we need most recent array so callback func as here our new array value depends on previous
         connections[id].close();
         delete connections[id];
-
-        const videoEl = document.getElementById();
       });
       socketRef.current.on("user-joined", (socketId, clients) => {
         clients.forEach((socketListId) => {
@@ -313,13 +317,12 @@ function VideoMeetingComponent() {
   };
 
   useEffect(() => {
-    if(screen !== true){
+    if (screen !== true) {
       if (video != undefined && audio != undefined) {
         getUserMedia();
         console.log("SET STATE HAS", video, audio);
       }
     }
-    
   }, [video, audio]);
 
   let getUserMedia = () => {
@@ -466,26 +469,17 @@ function VideoMeetingComponent() {
     // getUserMedia();
   };
   let handleEndCall = () => {
+    localStorage.removeItem("username");
+    localStorage.clear();
     try {
       let tracks = localVideoRef.current.srcObject.getTracks();
       tracks.forEach((track) => track.stop());
     } catch (e) {}
     window.location.href = "/";
   };
-  let handleScreen = async() => {
-    if(!screen){ //for case when we want to screen share but if on being asked for permission we click on cancel
-      try{
-        if(await navigator.mediaDevices.getDisplayMedia({video:true, audio: true})){
-          setScreen(true)
-        }
-      }catch(e){}
-      
-    }else{
-      setScreen(false);
-    }
-    
-    
-}
+  let handleScreen = async () => {
+    setScreen(!screen);
+  };
 
   useEffect(() => {
     if (screen == true) {
@@ -645,6 +639,9 @@ function VideoMeetingComponent() {
                     }}
                     autoPlay
                   ></video>
+                  <p className={styles.usernameLabel}>
+                    {otherUsernames[video.socketId] || "Unknown"}
+                  </p>
                 </div>
               ))}
             </div>
