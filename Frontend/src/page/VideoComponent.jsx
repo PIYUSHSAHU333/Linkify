@@ -34,7 +34,7 @@ function VideoMeetingComponent() {
   const [audio, setAudio] = useState(); //this represent multiple streams from other users
   const [video, setVideo] = useState([]); //this will be an array bc there will be streams of multiple users(video confrencing)
   const [screenAvailable, setScreenAvailable] = useState();
-  let [newMessages, setNewMessages] = useState(3);
+  let [newMessages, setNewMessages] = useState(0);
   const [showModal, setShowModal] = useState(true);
   let [messages, setMessages] = useState([]);
   let [screen, setScreen] = useState();
@@ -632,6 +632,9 @@ function VideoMeetingComponent() {
                 <div key={video.socketId}>
                   <video
                     data-socket={video.socketId}
+                    // Assign the video DOM element using a callback ref.
+                    // When both the element is mounted and a media stream is available,
+                    // set the stream as the video source so it plays automatically.
                     ref={(ref) => {
                       if (ref && video.stream) {
                         ref.srcObject = video.stream;
