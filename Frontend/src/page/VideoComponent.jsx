@@ -175,7 +175,7 @@ function VideoMeetingComponent() {
 
       socketRef.current.on("user-left", (id) => {
         setVideos((prevVideo) =>
-          prevVideo.filter((video) => video.SocketId !== id)
+          prevVideo.filter((video) => video.socketId !== id)
         ); //we're filtering out video of that user which has left, also used callback as we need most recent value array, if many users left at same time then react can batch up the setVideo and will not give us most recent array but we need most recent array so callback func as here our new array value depends on previous
         connections[id].close();
         delete connections[id];

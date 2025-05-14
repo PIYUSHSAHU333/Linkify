@@ -15,12 +15,22 @@ export const connectToSocket = (server) => {
   let messages = {};
 
   io.on("connect", (socket) => {
-    socket.on("join-call", (RoomId) => {
+    socket.on("join-call", (RoomId, username) => {
       if (connections[RoomId] === undefined) {
         connections[RoomId] = [];
       }
       connections[RoomId].push(socket.id);
       timeOnline[socket.id] = new Date();
+//for sending username of current user to other users
+      for(let a=0; a<connections[RoomId].length; a++){
+        if(connections[RoomId][a]== socket.id) continue
+
+        io.to(connections[RoomId][a]).emit(
+          "username",
+          socket.id,
+          username
+        )
+      }
 
       for (let a = 0; a < connections[RoomId].length; ++a) {
         io.to(connections[RoomId][a]).emit(
@@ -82,7 +92,7 @@ export const connectToSocket = (server) => {
         JSON.stringify(Object.entries(connections)) //deep copy of connections object
       )) {
         for (let a = 0; a < clients.length; ++a) {
-          if (room[a] === socket.id) {
+          if (clients[a] === socket.id) {
             key = room;
 
             for (let a = 0; connections[key].length; ++a) {
