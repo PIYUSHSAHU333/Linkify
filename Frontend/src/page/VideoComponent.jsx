@@ -11,7 +11,7 @@ import MicOffIcon from "@mui/icons-material/MicOff";
 import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
 import styles from "../Styles/VideoComponent.module.css";
 import io from "socket.io-client";
-import MsgInp from "../ui/MsgInp";
+
 import { Input } from "postcss";
 var connections = {};
 
@@ -45,11 +45,17 @@ function VideoMeetingComponent() {
   var socketRef = useRef();
   let socketIdRef = useRef();
   const videoRef = useRef([]);
+  const bottomRf = useRef(null)
   let connect = () => {
     setAskForUsername(false);
     getMedia();
   };
 
+  useEffect(()=>{
+      if(bottomRf.current){
+        bottomRf.current.scrollIntoView({behaviour: "smooth"});
+      }
+  }, [messages])
   let getDislayMedia = () => {
     if (screen) {
       if (navigator.mediaDevices.getDisplayMedia) {
@@ -535,7 +541,7 @@ function VideoMeetingComponent() {
 
   return (
     <>
-      <div>
+      <div className="overflow-hidden">
         {askForUsername === true ? (
           <div>
             <h2>Enter the lobby</h2>
@@ -557,26 +563,26 @@ function VideoMeetingComponent() {
             </div>
           </div>
         ) : (
-          <div className={styles.meetVideoContainer}>
+          <div className={`${styles.meetVideoContainer}`}>
             {showModal ? (
-              <div className={styles.chatRoom}>
-                <div className={styles.chatContainer}>
+              <div className={`${styles.chatRoom} z-20`}>
+                <div className={`${styles.chatContainer} msgDisplay h-[95%] z-10 pb-[90px] overflow-y-auto`}>
                   <h1
-                    className="text-4xl p-4 bg-[#26193A] text-[#fff] font-bold"
+                    className="text-4xl rounded-xl p-4 bg-[#26193A] text-[#fff] font-bold"
                     style={{ width: "100%", borderBottom: "solid 1px black" }}
                   >
                     Chat
                   </h1>
 
-                  <div className={styles.chattingDisplay}>
+                  <div className={`${styles.chattingDisplay} pl-1 z-10`}>
                     {messages.length !== 0 ? (
                       messages.map((item, index) => {
                         // console.log(message);
 
                         return (
-                          <div className="border-2 mt-2.5 ml-0.5 w-fit min-w-[50px]" style={{ marginBottom: "20px" }} key={index}>
-                            <p className="bg-[#26193A] text-[#8A72A8]" style={{ fontWeight: "bold" }}>{item.sender}</p>
-                            <p className="text-xl font-bold text-white">{item.data}</p>
+                          <div className="overflow-hidden msgData flex-wrap rounded-xl bg-[#26193A] p-1 pr-1.5 pb-3.5 mt-2.5 ml-0.5 w-fit min-w-[50px]" style={{ marginBottom: "20px" }} key={index}>
+                            <p className=" rounded-xl text-[#7b58af] " style={{ fontWeight: "bold" }}>{item.sender}</p>
+                            <p className="text-xl font-bold break-words max-w-[400px] text-white">{item.data}</p>
                           </div>
                         );
                       })
@@ -585,9 +591,10 @@ function VideoMeetingComponent() {
                         No messages yet :)
                       </p>
                     )}
+                    <div ref={bottomRf}></div>
                   </div>
-
-                  <div className={styles.chattingArea}>
+                    </div>
+                  <div className={`${styles.chattingArea} TF z-30 h-fit fixed bg-[#7b58af] bottom-0 border-t-2 pt-7 w-full `}>
                     <TextField
                       sx={{
                         input: { color: "#26193A" }, // input text color
@@ -635,7 +642,7 @@ function VideoMeetingComponent() {
                       Send
                     </Button>
                   </div>
-                </div>
+                
               </div>
             ) : (
               <></>

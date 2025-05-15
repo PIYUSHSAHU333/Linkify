@@ -73,12 +73,17 @@
 }
 .chatRoom {
     position: absolute;
-    height: 90vh;
+    height: 95vh;
+    /* overflow-y: auto; */
     right: 15px;
     top: 20px;
     background: #8A72A8;
-    border-radius: 20px;
+    border-radius: 12px;
+    /* padding-left: 4px; */
     width: 30vw;
+}
+.msgData{
+    border: solid 2px #8A72A8;
 }
 
 .chatContainer {
