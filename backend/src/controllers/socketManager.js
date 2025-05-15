@@ -13,15 +13,23 @@ export const connectToSocket = (server) => {
   let connections = {};
   let timeOnline = {};
   let messages = {};
+  let usernames = {};
 
-  io.on("connect", (socket) => {
+  io.on("connection", (socket) => {
     socket.on("join-call", (RoomId, username) => {
       if (connections[RoomId] === undefined) {
         connections[RoomId] = [];
       }
+      usernames[socket.id] = username //saving usernames at server
+      console.log("username:", username)
       connections[RoomId].push(socket.id);
       timeOnline[socket.id] = new Date();
-//for sending username of current user to other users
+      //for getting usernames of previously connected client for new user
+     const existingUsername = Object.entries(usernames).filter(([id])=> id!=socket.id).map(([id, name])=>({socketId: id, userName: name })) //just destructure the array and give array of objects to existingUsers variables 
+
+     socket.emit("existingUsers", existingUsername);
+      console.log(existingUsername);
+     //for sending username of current user to other users
       for(let a=0; a<connections[RoomId].length; a++){
         if(connections[RoomId][a]== socket.id) continue
 
@@ -95,7 +103,7 @@ export const connectToSocket = (server) => {
           if (clients[a] === socket.id) {
             key = room;
 
-            for (let a = 0; connections[key].length; ++a) {
+            for (let a = 0; a < connections[key].length; ++a) {
               io.to(connections[key][a]).emit("user-left", socket.id);
             }
             const index = connections[key].indexOf(socket.id);

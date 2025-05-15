@@ -162,6 +162,17 @@ function VideoMeetingComponent() {
 
     socketRef.current.on("connect", () => {
       socketRef.current.emit("join-call", window.location.href, username);
+      socketRef.current.on("existingUsers", (existingUsername) => {
+
+        setOtherUsernames((latestOtherUsername) => {
+          const updatedUsernames = { ...latestOtherUsername };
+          existingUsername.forEach(({ socketId, userName }) => {
+            updatedUsernames[socketId] = userName;
+          });
+          console.log("updated username: ",updatedUsernames);
+          return updatedUsernames;
+        });
+      });
       socketRef.current.on("username", (userId, username) => {
         setOtherUsernames((latestOtherUsername) => ({
           ...latestOtherUsername,
@@ -453,7 +464,7 @@ function VideoMeetingComponent() {
 
   let sendMessage = () => {
     console.log("Send message");
-    console.log(socketRef.current);
+    // console.log(socketRef.current);
     socketRef.current.emit("chat-message", message, username);
     setMessage("");
 
@@ -555,7 +566,7 @@ function VideoMeetingComponent() {
                   <div className={styles.chattingDisplay}>
                     {messages.length !== 0 ? (
                       messages.map((item, index) => {
-                        console.log(message);
+                        // console.log(message);
 
                         return (
                           <div style={{ marginBottom: "20px" }} key={index}>
