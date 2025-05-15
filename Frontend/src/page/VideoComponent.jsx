@@ -11,7 +11,8 @@ import MicOffIcon from "@mui/icons-material/MicOff";
 import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
 import styles from "../Styles/VideoComponent.module.css";
 import io from "socket.io-client";
-
+import MsgInp from "../ui/MsgInp";
+import { Input } from "postcss";
 var connections = {};
 
 // Configuration for WebRTC's RTCPeerConnection
@@ -163,13 +164,12 @@ function VideoMeetingComponent() {
     socketRef.current.on("connect", () => {
       socketRef.current.emit("join-call", window.location.href, username);
       socketRef.current.on("existingUsers", (existingUsername) => {
-
         setOtherUsernames((latestOtherUsername) => {
           const updatedUsernames = { ...latestOtherUsername };
           existingUsername.forEach(({ socketId, userName }) => {
             updatedUsernames[socketId] = userName;
           });
-          console.log("updated username: ",updatedUsernames);
+          console.log("updated username: ", updatedUsernames);
           return updatedUsernames;
         });
       });
@@ -188,7 +188,7 @@ function VideoMeetingComponent() {
         setVideos((prevVideo) =>
           prevVideo.filter((video) => video.socketId !== id)
         ); //we're filtering out video of that user which has left, also used callback as we need most recent value array, if many users left at same time then react can batch up the setVideo and will not give us most recent array but we need most recent array so callback func as here our new array value depends on previous
-        connections[id].close();
+        // connections[id].close();
         delete connections[id];
       });
       socketRef.current.on("user-joined", (socketId, clients) => {
@@ -561,7 +561,12 @@ function VideoMeetingComponent() {
             {showModal ? (
               <div className={styles.chatRoom}>
                 <div className={styles.chatContainer}>
-                  <h1>Chat</h1>
+                  <h1
+                    className="text-4xl p-4 bg-[#26193A] text-[#fff] font-bold"
+                    style={{ width: "100%", borderBottom: "solid 1px black" }}
+                  >
+                    Chat
+                  </h1>
 
                   <div className={styles.chattingDisplay}>
                     {messages.length !== 0 ? (
@@ -569,26 +574,64 @@ function VideoMeetingComponent() {
                         // console.log(message);
 
                         return (
-                          <div style={{ marginBottom: "20px" }} key={index}>
-                            <p style={{ fontWeight: "bold" }}>{item.sender}</p>
-                            <p>{item.data}</p>
+                          <div className="border-2 mt-2.5 ml-0.5 w-fit min-w-[50px]" style={{ marginBottom: "20px" }} key={index}>
+                            <p className="bg-[#26193A] text-[#8A72A8]" style={{ fontWeight: "bold" }}>{item.sender}</p>
+                            <p className="text-xl font-bold text-white">{item.data}</p>
                           </div>
                         );
                       })
                     ) : (
-                      <p>No messages yet</p>
+                      <p className="text-2xl text-white p-1.5 ">
+                        No messages yet :)
+                      </p>
                     )}
                   </div>
 
                   <div className={styles.chattingArea}>
                     <TextField
+                      sx={{
+                        input: { color: "#26193A" }, // input text color
+                        "& label": {
+                          color: "#26193A", // default label color
+                        },
+                        "& label.Mui-focused": {
+                          color: "#26193A", // label color on focus
+                        },
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "20px",
+                          "& fieldset": {
+                            borderColor: "#26193A",
+                          },
+                          "&:hover fieldset": {
+                            borderColor: "#FFFFFF",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#FFFFFF",
+                          },
+                        },
+                      }}
+                      className="text-white relative left-5 bottom-3 rounded-2xlt"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       id="outlined-basic"
                       label="Enter Your chat"
                       variant="outlined"
                     />
-                    <Button variant="contained" onClick={sendMessage}>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "#26193A",
+                        color: "#8A72A8",
+                        borderRadius: "20px",
+                        textTransform: "none", 
+                        "&:hover": {
+                          backgroundColor: "#8A72A8",
+                          color: "#26193A", 
+                        },
+                      }}
+                      className="relative left-6"
+                      onClick={sendMessage}
+                    >
                       Send
                     </Button>
                   </div>
@@ -640,8 +683,14 @@ function VideoMeetingComponent() {
 
             <div className={styles.conferenceView}>
               {videos.map((video) => (
-                <div key={video.socketId}>
+                <div className={styles.videosContainer} key={video.socketId}>
                   <video
+                    style={{
+                      width: "350px",
+                      height: "auto",
+                      borderRadius: "20px",
+                      margin: "7px",
+                    }}
                     data-socket={video.socketId}
                     // Assign the video DOM element using a callback ref.
                     // When both the element is mounted and a media stream is available,
@@ -653,6 +702,7 @@ function VideoMeetingComponent() {
                     }}
                     autoPlay
                   ></video>
+
                   <p className={styles.usernameLabel}>
                     {otherUsernames[video.socketId] || "Unknown"}
                   </p>
