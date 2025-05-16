@@ -1,27 +1,68 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import withAuth from "../utils/withAuth";
 import LogoutBtn from "../ui/LogOutBtn";
 import HistoryIcon from "@mui/icons-material/History";
 import Button from "@mui/material/Button";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+
 function Home() {
   const navigate = useNavigate();
   const [meetingCode, setMeetingCode] = useState("");
-  const handleJoinCall = () => {
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [meetingHistory, setMeetingHistory] = useState([]);
+  const { getUserHistory, addToHistory } = useContext(AuthContext);
+  const handleJoinCall = async() => {
+    await addToHistory(meetingCode)
+    let history = await getUserHistory();
+    console.log("history from join btn:",history);
     navigate(`/${meetingCode}`);
   };
+
+  useEffect(() => {
+    try {
+      const fetchHistory = async () => {
+        let history = await getUserHistory();
+        console.log("history: ", history)
+        setMeetingHistory(history);
+      };
+      fetchHistory()
+    } catch (e) {
+      console.log("history not found:",e);
+    }
+  
+  }, []);
   return (
     <div className="homeComp flex flex-col min-h-screen">
       <div className="navBar cursor-pointer text-amber-100 p-2 flex justify-between items-center">
         <div className="name pl-14 text-4xl font-bold">Linkify</div>
         <div className="navLink pr-14 flex justify-evenly gap-9 items-center">
-          <Link>
+          <Link onClick={()=>{setHistoryOpen(!historyOpen)}}>
             <HistoryIcon /> History
           </Link>
           <Link>Contact</Link>
           <LogoutBtn />
         </div>
       </div>
+
+      {historyOpen ? (
+        <div className="cards">
+          {meetingHistory.map((e, i) => {
+            return (
+              <>
+                  <div key={i} class="card blue">
+                    <p class="tip">Code: {e.meetingCode}</p>
+                    <p class="second-text ">Date: {e.date}</p>
+                  </div>
+               
+              </>
+            );
+          })}
+        </div>
+      ) : (
+       <></>
+      )}
 
       <div className="contentContainer p-5 flex justify-between items-center">
         <div className="p-8">

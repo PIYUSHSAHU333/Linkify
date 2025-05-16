@@ -4,7 +4,8 @@ const schema = mongoose.Schema;
 
 const meetingSchema = new schema({
     user_id:{
-        type: String,
+        type:schema.Types.ObjectId,
+        ref: "User"
     },
     meetingCode: {
         type: String,

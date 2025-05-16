@@ -45,9 +45,34 @@ export const AuthProvider = ({ children }) => {
       throw err;
     }
   };
+
+  const getUserHistory =async ()=>{
+    try{
+     let request = await client.get("/getMeetingHistory", {
+        params: {
+          token: localStorage.getItem("token")
+        }
+      }) 
+      return request.data
+    }catch(e){
+      throw e
+    }
+  }
+  const addToHistory = async (meetingCode)=>{
+    try{
+      let request = await client.post("/addMeetingHistory", {
+        token: localStorage.getItem("token"),
+        meetingCode: meetingCode
+      })
+      console.log(request.data.message);
+      return request 
+    }catch(e){
+        throw e
+    }
+  }
   return (
     <>
-      <AuthContext.Provider value={{ handleRegister, handleLogin,userData, setUserData }}>
+      <AuthContext.Provider value={{ handleRegister,getUserHistory, addToHistory ,handleLogin,userData, setUserData }}>
         {children}
       </AuthContext.Provider>
     </>

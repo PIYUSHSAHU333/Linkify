@@ -336,6 +336,59 @@
 }
 
 .homeComp{
-  background: linear-gradient(135deg, #15054e, #3d1d70);
+  background: linear-gradient(135deg, #15054e, #513380);
+}
+/* From Uiverse.io by kamehame-ha */ 
+.cards {
+  transition:all;
+  position: absolute;
+  right: 290px;
+  top: 50px;
+  display: flex;
+  border: solid 4px rgba(171, 27, 158, 0.5);
+  background-color: rgba(171, 27, 158, 0.5);
+  border-radius: 20px;
+  padding: 20px;
+  flex-direction: column;
+  gap: 15px;
 }
 
+.cards .blue {
+  background-color: #513380;
+}
+
+
+
+.cards .card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  border: solid 2px #f472b6;
+  height: 100px;
+  width: 250px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: 400ms;
+}
+
+.cards .card p.tip {
+  font-size: 1em;
+  font-weight: 700;
+}
+
+.cards .card p.second-text {
+  font-size: .9em;
+  margin-top: 5px;
+}
+
+.cards .card:hover {
+  transform: scale(1.1, 1.1);
+}
+
+.cards:hover > .card:not(:hover) {
+  filter: blur(10px);
+  transform: scale(0.9, 0.9);
+}
