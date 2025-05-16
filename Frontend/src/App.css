@@ -335,5 +335,7 @@
   text-decoration: underline;
 }
 
-
+.homeComp{
+  background: linear-gradient(135deg, #15054e, #3d1d70);
+}
 

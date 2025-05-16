@@ -4,6 +4,7 @@ import Authentication from "./page/Authentication";
 import { Route, BrowserRouter, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import VideoMeetingComponent from "./page/VideoComponent";
+import Home from "./page/Home";
 function App() {
   return (
     <>
@@ -13,7 +14,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<Authentication />} />
           <Route path="/:url" element={<VideoMeetingComponent/>} />
-        </Routes>
+          <Route path="/home" element={<Home/>}/>
+         </Routes>
         </AuthProvider>
       </BrowserRouter>
     </>
