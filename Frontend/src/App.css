@@ -1,179 +1,50 @@
-*{
-    box-sizing: border-box;
+* {
+  box-sizing: border-box;
 }
-.landingPageContainer{
-    width: 100vw;
-    height: 100vh;
-    background: url("media/images/background2.png");
-    background-repeat: no-repeat;
-    color: white;
-    background-size: cover;
-    overflow-y: scroll;
-}
-
 /* Scrollbar track (background of the scrollbar) */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 5px;
-  }
-  
-  /* Scrollbar thumb (the draggable part of the scrollbar) */
-  ::-webkit-scrollbar-thumb {
-    background-color: #D97500;
-    border-radius: 10px;
-  }
-  
-  /* Scrollbar thumb on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: #B76F00;
-  }
-  
-  /* Scrollbar track (optional) */
-  ::-webkit-scrollbar-track {
-    background-color: #1a1a1a; /* Dark background */
-    border-radius: 10px;
-  }
-  
-
-.landingPageContainer nav{
-    padding:1.2rem 1.6rem ;
-    /* display: flex;
-    align-items: center;
-    justify-content: space-between; */
+  width: 6px;
+  height: 5px;
 }
 
-.landingPageContainer nav h2{
-    font-size: 1.8rem;
-    font-weight: 500;
+/* Scrollbar thumb (the draggable part of the scrollbar) */
+::-webkit-scrollbar-thumb {
+  background-color: #d97500;
+  border-radius: 10px;
 }
-.landingPageContainer nav .navlist{
-    display: flex;
-    gap: 1.6rem;
-    cursor: pointer;
+
+/* Scrollbar thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #b76f00;
 }
-.landingMainContainer{
-    height: 80vh;
+
+/* Scrollbar track (optional) */
+::-webkit-scrollbar-track {
+  background-color: #1a1a1a; /* Dark background */
+  border-radius: 10px;
 }
-.landingMainContainer > div:nth-child(1) div[role="button"]{
-    width: fit-content;
-    background-color: #D97500;
-    padding-inline: 1rem;
+
+.landingPageContainer {
+  background: linear-gradient(135deg, #15054e, #513380);
+  overflow-x: hidden;
 }
-/* login btn */
-/* From Uiverse.io by SupportHotline */ 
-.login-btn {
-    background: var(--color-back);
-    border-radius: 0.5em;
-    box-shadow:
-      inset 0px -6px 18px -6px rgba(217, 117, 0, 0),
-      inset rgba(217, 117, 0, 1) -1px -1px 6px 0px,
-      inset 12px 0px 12px -6px rgba(217, 117, 0, 0),
-      inset -12px 0px 12px -6px rgba(217, 117, 0, 0),
-      rgba(217, 117, 0, 1) -1px -1px 6px 0px;
-    border: solid 2px #030f14;
-    cursor: pointer;
-    font-size: 18px;
-    padding: 0.7em 1.7em;
-    outline: none;
-    transition: all 0.3s;
-    user-select: none;
-  }
-  
-  .login-btn:hover {
-    box-shadow:
-      inset 0px -6px 18px -6px rgba(217, 117, 0, 1),
-      inset 0px 6px 18px -6px rgba(217, 117, 0, 1),
-      inset 12px 0px 12px -6px rgba(217, 117, 0, 0),
-      inset -12px 0px 12px -6px rgba(217, 117, 0, 0),
-      -1px -1px 6px 0px rgba(217, 117, 0, 1);
-  }
-  
-  .login-btn:active {
-    box-shadow:
-      inset 0px -12px 12px -6px rgba(217, 117, 0, 1),
-      inset 0px 12px 12px -6px rgba(217, 117, 0, 1),
-      inset 12px 0px 12px -6px rgba(217, 117, 0, 1),
-      inset -12px 0px 12px -6px rgba(217, 117, 0, 1),
-      -1px -1px 6px 0px rgba(217, 117, 0, 1);
-  }
-  
-  .text {
-    color: white;
-    font-weight: 700;
-    margin: auto;
-    transition: all 0.3s;
-    width: fit-content;
-  }
-  
-  .login-btn:hover .text {
-    transform: scale(0.9);
-  }
-  
-  .login-btn:active .text {
-    transform: scale(0.8);
-  }
-  .btn-shine {
-    padding: 12px 48px;
-    color: #fff;
-    background: linear-gradient(to right, #9f9f9f 0, #fff 10%, #868686 20%);
-    background-position: 0;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shine 3s infinite linear;
-    animation-fill-mode: forwards;
-    -webkit-text-size-adjust: none;
-    font-weight: 600;
-    font-size: 16px;
-    text-decoration: none;
-    white-space: nowrap;
-    font-family: "Poppins", sans-serif;
-  }
-  @-moz-keyframes shine {
-    0% {
-      background-position: 0;
-    }
-    60% {
-      background-position: 180px;
-    }
-    100% {
-      background-position: 180px;
-    }
-  }
-  @-webkit-keyframes shine {
-    0% {
-      background-position: 0;
-    }
-    60% {
-      background-position: 180px;
-    }
-    100% {
-      background-position: 180px;
-    }
-  }
-  @-o-keyframes shine {
-    0% {
-      background-position: 0;
-    }
-    60% {
-      background-position: 180px;
-    }
-    100% {
-      background-position: 180px;
-    }
-  }
-  @keyframes shine {
-    0% {
-      background-position: 0;
-    }
-    60% {
-      background-position: 180px;
-    }
-    100% {
-      background-position: 180px;
-    }
-  }
-  
-  /* From Uiverse.io by zanina-yassine */ 
+.meetingImg {
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 8px 8px 20px rgba(171, 27, 158, 0.3);
+  border: solid 20px rgba(255, 255, 255, 0.2);
+}
+.meetingImg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* border: 10px solid rgba(128, 90, 213); */
+  border-radius: 16px;
+  filter: blur(10px);
+  pointer-events: none;
+  z-index: 0;
+}
+/* From Uiverse.io by zanina-yassine */
 .form_container {
   width: fit-content;
   height: fit-content;
@@ -189,16 +60,20 @@
     0px 7px 15px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
   border-radius: 11px;
   font-family: "Inter", sans-serif;
-  
 }
 
 .logo_container {
   box-sizing: border-box;
   width: 80px;
   height: 80px;
-  background: linear-gradient(180deg, rgba(248, 248, 248, 0) 50%, #F8F8F888 100%);
-  border: 1px solid #F7F7F8;
-  filter: drop-shadow(0px 0.5px 0.5px #EFEFEF) drop-shadow(0px 1px 0.5px rgba(239, 239, 239, 0.5));
+  background: linear-gradient(
+    180deg,
+    rgba(248, 248, 248, 0) 50%,
+    #f8f8f888 100%
+  );
+  border: 1px solid #f7f7f8;
+  filter: drop-shadow(0px 0.5px 0.5px #efefef)
+    drop-shadow(0px 1px 0.5px rgba(239, 239, 239, 0.5));
   border-radius: 11px;
 }
 
@@ -222,7 +97,7 @@
   max-width: 80%;
   text-align: center;
   line-height: 1.1rem;
-  color: #8B8E98
+  color: #8b8e98;
 }
 
 .input_container {
@@ -244,7 +119,7 @@
 
 .input_label {
   font-size: 0.75rem;
-  color: #8B8E98;
+  color: #8b8e98;
   font-weight: 600;
 }
 
@@ -270,7 +145,7 @@
   width: 100%;
   height: 40px;
   border: 0;
-  background: #115DFC;
+  background: #115dfc;
   border-radius: 7px;
   outline: none;
   color: #ffffff;
@@ -317,7 +192,7 @@
   align-items: center;
   justify-content: center;
   gap: 30px;
-  color: #8B8E98;
+  color: #8b8e98;
 }
 
 .separator .line {
@@ -330,17 +205,17 @@
 
 .note {
   font-size: 0.75rem;
-  color: #8B8E98;
+  color: #8b8e98;
   text-align: center;
   text-decoration: underline;
 }
 
-.homeComp{
+.homeComp {
   background: linear-gradient(135deg, #15054e, #513380);
 }
-/* From Uiverse.io by kamehame-ha */ 
+/* From Uiverse.io by kamehame-ha */
 .cards {
-  transition:all;
+  transition: all;
   position: absolute;
   right: 290px;
   top: 50px;
@@ -356,8 +231,6 @@
 .cards .blue {
   background-color: #513380;
 }
-
-
 
 .cards .card {
   display: flex;
@@ -380,7 +253,7 @@
 }
 
 .cards .card p.second-text {
-  font-size: .9em;
+  font-size: 0.9em;
   margin-top: 5px;
 }
 
