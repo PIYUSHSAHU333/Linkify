@@ -25,8 +25,11 @@
 }
 
 .landingPageContainer {
-  background: linear-gradient(135deg, #15054e, #513380);
+  background: linear-gradient(135deg, #15054e, #5c3d8f);
   overflow-x: hidden;
+}
+.HeroSection{
+  z-index: 1;
 }
 .meetingImg {
   position: relative;
@@ -44,6 +47,50 @@
   pointer-events: none;
   z-index: 0;
 }
+.cta-glow{
+  position: absolute;
+  box-shadow: 0px 0px 1000px 180px rgba(171, 27, 158, 0.5);
+  z-index: 0;
+}
+.img-glow{
+  position: absolute;
+  box-shadow: 0px 0px 800px 130px rgba(217, 117, 0, 0.5);
+  z-index: 0;
+}
+.feature-glow{
+   position: absolute;
+  box-shadow: 0px 0px 800px 250px rgba(171, 27, 158, 0.5);
+  z-index: 0;
+}
+.priceCards:hover{
+  transform: scale(103%);
+  cursor: pointer;
+}
+.pricingCards > :nth-child(2){
+  transform: scale(111%);
+}
+.Testimony{
+  position: relative;
+  z-index: 20;
+}
+.ceoImg{
+  transition: transform 0.2s ease-in-out;
+}
+.ceoImg:hover{
+  transform: scale(105%);
+  cursor: pointer;
+}
+/* .Testimony::before{
+  content: "";
+  position: absolute;
+  filter: blur(10px);
+  z-index: 2;
+  cursor: pointer;
+  width: 1000px;
+  height: 1000px;
+  border: solid 3px black;
+}  */
+
 /* From Uiverse.io by zanina-yassine */
 .form_container {
   width: fit-content;

@@ -4,6 +4,10 @@ import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import "../App.css";
 import HeroSection from "../Sections/HeroSection";
 import FeatureSection from "../Sections/FeatureSection";
+import Testimony from "../Sections/Testimonial";
+import PriceSection from "../Sections/PriceSection";
+import FAQ from "../Sections/FAQ";
+import { Fab } from "@mui/material";
 function LandingPage() {
   return <div className="landingPageContainer ">
     <div className="navbar pt-3 p-2 flex items-center justify-between text-amber-50">
@@ -20,6 +24,9 @@ function LandingPage() {
     </div>
     <HeroSection/>
    <FeatureSection/>
+   <Testimony/>
+   <PriceSection/>
+   <FAQ/>
   </div>;
 }
 
