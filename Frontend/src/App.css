@@ -24,10 +24,6 @@
   border-radius: 10px;
 }
 
-.landingPageContainer {
-  background: linear-gradient(135deg, #15054e, #5c3d8f);
-  overflow-x: hidden;
-}
 .HeroSection{
   z-index: 1;
 }
@@ -68,6 +64,20 @@
 }
 .pricingCards > :nth-child(2){
   transform: scale(111%);
+}
+.faq h1{
+  color: #fef3c7;
+  font-size: 36px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+.faq{
+  cursor: pointer;
+}
+.faq p{
+  color: #e5e7eb;
+  font-size: 18px;
+  margin-top: 18px;
 }
 .Testimony{
   position: relative;

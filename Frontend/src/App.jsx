@@ -5,12 +5,11 @@ import { Route, BrowserRouter, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import VideoMeetingComponent from "./page/VideoComponent";
 import Home from "./page/Home";
-import {HeroUIProvider} from "@heroui/react";
-
+import FooterDemo from "./ui/Footer";
 function App() {
   return (
     <>
-    <HeroUIProvider>
+    
       <BrowserRouter>
       <AuthProvider>
         <Routes>
@@ -19,9 +18,10 @@ function App() {
           <Route path="/:url" element={<VideoMeetingComponent/>} />
           <Route path="/home" element={<Home/>}/>
          </Routes>
+          <FooterDemo/>
         </AuthProvider>
       </BrowserRouter>
-      </HeroUIProvider>
+      
     </>
   );
 }

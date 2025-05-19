@@ -5,7 +5,7 @@ import PrivacyTipIcon from "@mui/icons-material/PrivacyTip";
 import MessageIcon from "@mui/icons-material/Message";
 function FeatureSection() {
   return (
-    <div className="FeatureSection flex-col w-8/10 mx-auto items-center justify-center flex min-h-screen  ">
+    <div className="FeatureSection flex-col w-8/10 mx-auto items-center justify-center flex min-h-screen  " id="FeatureSection">
       <div className="flex flex-col items-center">
         <div className="feature-glow"></div>
         <p className="text-[#F083E7] text-2xl font-bold z-20">Connect Faster</p>

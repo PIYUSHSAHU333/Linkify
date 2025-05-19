@@ -1,14 +1,129 @@
-import React from 'react';
-import "./LogoutBtn.css"
-function LogoutBtn() {
-    return ( 
-        <button class="Btn">
-  
-  <div class="sign"><svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg></div>
-  
-  <div class="text">Logout</div>
-</button>
-     );
+import React, { useState, useRef, useCallback, useEffect, forwardRef } from "react";
+
+function cn(...classes) {
+  return classes.filter(Boolean).join(" ");
 }
 
-export default LogoutBtn;
+const HoverButton = forwardRef(({ className, children, ...props }, ref) => {
+  const buttonRef = useRef(null);
+  const [isListening, setIsListening] = useState(false);
+  const [circles, setCircles] = useState([]);
+  const lastAddedRef = useRef(0);
+
+  const createCircle = useCallback((x, y) => {
+    const buttonWidth = buttonRef.current ? buttonRef.current.offsetWidth : 0;
+    const xPos = x / buttonWidth;
+    const color = `linear-gradient(to right, var(--circle-start) ${xPos * 100}%, var(--circle-end) ${
+      xPos * 100
+    }%)`;
+
+    setCircles((prev) => [
+      ...prev,
+      { id: Date.now(), x, y, color, fadeState: null },
+    ]);
+  }, []);
+
+  const handlePointerMove = useCallback(
+    (event) => {
+      if (!isListening) return;
+
+      const currentTime = Date.now();
+      if (currentTime - lastAddedRef.current > 100) {
+        lastAddedRef.current = currentTime;
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        createCircle(x, y);
+      }
+    },
+    [isListening, createCircle]
+  );
+
+  const handlePointerEnter = useCallback(() => {
+    setIsListening(true);
+  }, []);
+
+  const handlePointerLeave = useCallback(() => {
+    setIsListening(false);
+  }, []);
+
+  useEffect(() => {
+    circles.forEach((circle) => {
+      if (!circle.fadeState) {
+        setTimeout(() => {
+          setCircles((prev) =>
+            prev.map((c) =>
+              c.id === circle.id ? { ...c, fadeState: "in" } : c
+            )
+          );
+        }, 0);
+
+        setTimeout(() => {
+          setCircles((prev) =>
+            prev.map((c) =>
+              c.id === circle.id ? { ...c, fadeState: "out" } : c
+            )
+          );
+        }, 1000);
+
+        setTimeout(() => {
+          setCircles((prev) => prev.filter((c) => c.id !== circle.id));
+        }, 2200);
+      }
+    });
+  }, [circles]);
+
+  return (
+    <button
+      ref={(el) => {
+        buttonRef.current = el;
+        if (typeof ref === "function") ref(el);
+        else if (ref) ref.current = el;
+      }}
+      className={cn(
+        "relative isolate px-8 py-3 rounded-3xl",
+        "text-foreground font-medium text-base leading-6",
+        "backdrop-blur-lg bg-[rgba(43,55,80,0.1)]",
+        "cursor-pointer overflow-hidden",
+        "before:content-[''] before:absolute before:inset-0",
+        "before:rounded-[inherit] before:pointer-events-none",
+        "before:z-[1]",
+        "before:shadow-[inset_0_0_0_1px_rgba(170,202,255,0.2),inset_0_0_16px_0_rgba(170,202,255,0.1),inset_0_-3px_12px_0_rgba(170,202,255,0.15),0_1px_3px_0_rgba(0,0,0,0.50),0_4px_12px_0_rgba(0,0,0,0.45)]",
+        "before:mix-blend-multiply before:transition-transform before:duration-300",
+        "active:before:scale-[0.975]",
+        className
+      )}
+      onPointerMove={handlePointerMove}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+      {...props}
+      style={{
+        "--circle-start": "var(--tw-gradient-from, #a0d9f8)",
+        "--circle-end": "var(--tw-gradient-to, #3a5bbf)",
+      }}
+    >
+      {circles.map(({ id, x, y, color, fadeState }) => (
+        <div
+          key={id}
+          className={cn(
+            "absolute w-3 h-3 -translate-x-1/2 -translate-y-1/2 rounded-full",
+            "blur-lg pointer-events-none z-[-1] transition-opacity duration-300",
+            fadeState === "in" && "opacity-75",
+            fadeState === "out" && "opacity-0 duration-[1.2s]",
+            !fadeState && "opacity-0"
+          )}
+          style={{
+            left: x,
+            top: y,
+            background: color,
+          }}
+        />
+      ))}
+      {children}
+    </button>
+  );
+});
+
+HoverButton.displayName = "HoverButton";
+
+export { HoverButton };

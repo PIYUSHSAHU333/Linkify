@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import withAuth from "../utils/withAuth";
-import LogoutBtn from "../ui/LogOutBtn";
+// import LogoutBtn from "../ui/LogOutBtn";
 import HistoryIcon from "@mui/icons-material/History";
 import Button from "@mui/material/Button";
 import { useContext } from "react";
