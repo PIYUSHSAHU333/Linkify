@@ -13,6 +13,7 @@ const withAuth = (WrappedComponent) => {
     useEffect(() => {
       if (!isAuthenticated()) {
         router("/auth");
+        console.log("not authenticated-token",localStorage.getItem("token") )
       }
     }, []);
     return <WrappedComponent {...props}/>

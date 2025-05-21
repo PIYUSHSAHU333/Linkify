@@ -1,19 +1,27 @@
-import React from "react";
-// import { Link } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import { Link as RouterLink} from "react-router-dom";
 import { Link } from 'react-scroll';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import "../App.css";
 import HeroSection from "../Sections/HeroSection";
 import FeatureSection from "../Sections/FeatureSection";
 import Testimony from "../Sections/Testimonial";
+import { AuthContext } from "../context/AuthContext";
 import PriceSection from "../Sections/PriceSection";
 import FAQ from "../Sections/FAQ";
-import {HoverButton} from "../ui/LogOutBtn";
+import {HoverButton} from "../ui/LogInBtn";
 
 // import { Footer } from "../ui/Footer";
 // import { Fab } from "@mui/material";
 import BeamsBackground from "../ui/BackgroundBeams";
 function LandingPage() {
+  const {isLoggedIn, userData} = useContext(AuthContext)
+  useEffect(()=>{
+      let token = localStorage.getItem("token");
+      console.log("token from landing page:",token)
+      isLoggedIn()
+  }, [])
+
   return (
     <div className=" min-h-screen ">
   <div className="fixed inset-0 -z-10">
@@ -30,7 +38,9 @@ function LandingPage() {
           
       </div>
       <div className="login font-semibold text-xl pr-14">
-          <Link><HoverButton>Login</HoverButton></Link>
+          {userData ? <HoverButton onClick={()=>{
+            localStorage.removeItem("token")
+          }}>Logout</HoverButton>: <RouterLink to="/auth"><HoverButton>Login</HoverButton></RouterLink>}
       </div>
     </div>
     <HeroSection/>

@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const authContext = useContext(AuthContext);
 
   const router = useNavigate()
-  const [userData, setUserData] = useState(authContext);
+  const [userData, setUserData] = useState();
 
   const handleRegister = async (username, name, password) => {
     try {
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
         name: name,
         password: password,
       });
-
+  
       if (request.status === httpStatus.CREATED) {
         return request.data.message;
       }
@@ -37,9 +37,12 @@ export const AuthProvider = ({ children }) => {
         password: password,
       });
 
-      if (request.status === httpStatus.OK) {
+      if (request.status === httpStatus.OK && request.data.token) {
         localStorage.setItem("token", request.data.token);
-        router("/home")
+        router("/home");
+        console.log("token stored:",localStorage.getItem("token"));
+      }else{
+        console.log("token missing")
       }
     } catch (err) {
       throw err;
@@ -50,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     try{
      let request = await client.get("/getMeetingHistory", {
         params: {
-          token: localStorage.getItem("token")
+          userId : userData._id
         }
       }) 
       return request.data
@@ -62,6 +65,7 @@ export const AuthProvider = ({ children }) => {
     try{
       let request = await client.post("/addMeetingHistory", {
         token: localStorage.getItem("token"),
+        userId: userData._id,
         meetingCode: meetingCode
       })
       console.log(request.data.message);
@@ -70,9 +74,29 @@ export const AuthProvider = ({ children }) => {
         throw e
     }
   }
+
+  const isLoggedIn = async()=>{
+    try{
+      let token = localStorage.getItem("token");
+      console.log("token:",token)
+      if(token){
+
+       const request = await client.get("/verifyUser", {
+          headers: {Authorization: `Bearer ${token}`}
+        });
+        setUserData(request.data.user)
+      }else{
+        setUserData(null)
+        return
+      }
+    }catch(e){
+      localStorage.removeItem("token");
+      setUserData(null)
+    }
+  }
   return (
     <>
-      <AuthContext.Provider value={{ handleRegister,getUserHistory, addToHistory ,handleLogin,userData, setUserData }}>
+      <AuthContext.Provider value={{ handleRegister,getUserHistory, isLoggedIn, addToHistory ,handleLogin, userData, setUserData }}>
         {children}
       </AuthContext.Provider>
     </>

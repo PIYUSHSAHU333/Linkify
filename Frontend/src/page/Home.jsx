@@ -1,44 +1,66 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import withAuth from "../utils/withAuth";
-// import LogoutBtn from "../ui/LogOutBtn";
+import LogoutBtn from "../ui/LogOutBtn";
 import HistoryIcon from "@mui/icons-material/History";
 import Button from "@mui/material/Button";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 function Home() {
+  const {isLoggedIn} = useContext(AuthContext)
   const navigate = useNavigate();
   const [meetingCode, setMeetingCode] = useState("");
   const [historyOpen, setHistoryOpen] = useState(false);
   const [meetingHistory, setMeetingHistory] = useState([]);
   const { getUserHistory, addToHistory } = useContext(AuthContext);
-  const handleJoinCall = async() => {
-    await addToHistory(meetingCode)
+  const handleJoinCall = async () => {
+    await addToHistory(meetingCode);
     let history = await getUserHistory();
-    console.log("history from join btn:",history);
+    console.log("history from join btn:", history);
     navigate(`/${meetingCode}`);
   };
 
   useEffect(() => {
+    let token = localStorage.getItem("token");
+    console.log("token from homepage useEffect:",token)
+    const LoggedIn = async()=>{
+      try{
+        await isLoggedIn() //calling this here so to set userData stateVariable
+      }catch(e){
+        console.log("error from isLoggedIn", e)
+      }
+       
+    }
     try {
       const fetchHistory = async () => {
-        let history = await getUserHistory();
-        console.log("history: ", history)
-        setMeetingHistory(history);
+        try{
+           let history = await getUserHistory();
+        if (history) {
+          console.log("history: ", history);
+          setMeetingHistory(history);
+        }
+        }catch(e){
+          console.log("error from fetchHistory:",e)
+        }
+       
       };
-      fetchHistory()
+      LoggedIn()
+      fetchHistory();
     } catch (e) {
-      console.log("history not found:",e);
+      console.log("history not found:", e);
     }
-  
   }, []);
   return (
     <div className="homeComp flex flex-col min-h-screen">
       <div className="navBar cursor-pointer text-amber-100 p-2 flex justify-between items-center">
         <div className="name pl-14 text-4xl font-bold">Linkify</div>
         <div className="navLink pr-14 flex justify-evenly gap-9 items-center">
-          <Link onClick={()=>{setHistoryOpen(!historyOpen)}}>
+          <Link
+            onClick={() => {
+              setHistoryOpen(!historyOpen);
+            }}
+          >
             <HistoryIcon /> History
           </Link>
           <Link>Contact</Link>
@@ -48,20 +70,24 @@ function Home() {
 
       {historyOpen ? (
         <div className="cards">
-          {meetingHistory.map((e, i) => {
+          (
+           {meetingHistory ? meetingHistory.map((e, i) => {
             return (
               <>
-                  <div key={i} class="card blue">
-                    <p class="tip">Code: {e.meetingCode}</p>
-                    <p class="second-text ">Date: {e.date}</p>
-                  </div>
-               
+                <div key={i} class="card blue">
+                  <p class="tip">Code: {e.meetingCode}</p>
+                  <p class="second-text ">Date: {e.date}</p>
+                </div>
               </>
             );
-          })}
+          }) : <div classname="card blue">
+            <p className="tip">No meeting history</p>
+            </div>} 
+          
+          )
         </div>
       ) : (
-       <></>
+        <></>
       )}
 
       <div className="contentContainer p-5 flex justify-between items-center">
