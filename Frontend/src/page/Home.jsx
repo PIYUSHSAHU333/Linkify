@@ -23,10 +23,10 @@ function Home() {
 
   useEffect(() => {
     let token = localStorage.getItem("token");
-    console.log("token from homepage useEffect:",token)
     const LoggedIn = async()=>{
       try{
         await isLoggedIn() //calling this here so to set userData stateVariable
+        console.log(localStorage.getItem("token"), "token after isLogedIn")
       }catch(e){
         console.log("error from isLoggedIn", e)
       }
@@ -54,7 +54,7 @@ function Home() {
   return (
     <div className="homeComp flex flex-col min-h-screen">
       <div className="navBar cursor-pointer text-amber-100 p-2 flex justify-between items-center">
-        <div className="name pl-14 text-4xl font-bold">Linkify</div>
+        <Link to={"/"}><div className="name pl-14 text-4xl font-bold">Linkify</div></Link>
         <div className="navLink pr-14 flex justify-evenly gap-9 items-center">
           <Link
             onClick={() => {
@@ -68,10 +68,10 @@ function Home() {
         </div>
       </div>
 
-      {historyOpen ? (
+      {historyOpen ? 
         <div className="cards">
-          (
-           {meetingHistory ? meetingHistory.map((e, i) => {
+          
+           {meetingHistory.length > 0 ? meetingHistory.map((e, i) => {
             return (
               <>
                 <div key={i} class="card blue">
@@ -84,11 +84,11 @@ function Home() {
             <p className="tip">No meeting history</p>
             </div>} 
           
-          )
+          
         </div>
-      ) : (
+       : 
         <></>
-      )}
+      }
 
       <div className="contentContainer p-5 flex justify-between items-center">
         <div className="p-8">

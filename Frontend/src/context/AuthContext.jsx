@@ -50,10 +50,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const getUserHistory =async ()=>{
+    console.log("user data:",userData)
     try{
      let request = await client.get("/getMeetingHistory", {
         params: {
-          userId : userData._id
+          userId : userData.userId
         }
       }) 
       return request.data
@@ -78,19 +79,19 @@ export const AuthProvider = ({ children }) => {
   const isLoggedIn = async()=>{
     try{
       let token = localStorage.getItem("token");
-      console.log("token:",token)
+      // console.log("token from inside of isLogged in",token)
       if(token){
 
        const request = await client.get("/verifyUser", {
           headers: {Authorization: `Bearer ${token}`}
         });
-        setUserData(request.data.user)
+        setUserData(request.data.user);
       }else{
-        setUserData(null)
+        // setUserData(null)
         return
       }
     }catch(e){
-      localStorage.removeItem("token");
+      console.log("error from isLoggedIn:", e)
       setUserData(null)
     }
   }

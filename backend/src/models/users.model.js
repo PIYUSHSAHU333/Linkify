@@ -15,9 +15,6 @@ const userSchmea = new schema({
     password:{
         type: String,
         required: true
-    },
-    token:{
-        type: String
     }
 });
 
