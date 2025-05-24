@@ -100,7 +100,7 @@ function Home() {
             real-time chat, and easy one-click join, anytime, anywhere.
           </p>
           <div className=" mt-5 ">
-            <form onSubmit={handleJoinCall} className="flex flex-col gap-2">
+            <form onSubmit={ (e)=>{e.preventDefault(); handleJoinCall()}} className="flex flex-col gap-2">
               <label htmlFor="meetingCode" className="text-amber-50">
                 Enter Meeting code
               </label>

@@ -67,8 +67,11 @@ function FooterDemo() {
                   key={i}
                   className="rounded-full border p-2 hover:bg-primary hover:text-white transition-colors"
                 >
+                  <div className='cursor-pointer'>
                   <Icon className="h-4 w-4" />
                   <span className="sr-only">{Icon.name}</span>
+                  </div>
+                  
                 </button>
               ))}
             </div>

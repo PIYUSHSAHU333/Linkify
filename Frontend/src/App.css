@@ -270,7 +270,6 @@
 .homeComp {
   background: linear-gradient(135deg, #15054e, #513380);
 }
-/* From Uiverse.io by kamehame-ha */
 .cards {
   transition: all;
   position: absolute;
@@ -282,6 +281,8 @@
   border-radius: 20px;
   padding: 20px;
   flex-direction: column;
+  overflow-y: auto;
+  max-height: 600px;
   gap: 15px;
 }
 
@@ -315,10 +316,10 @@
 }
 
 .cards .card:hover {
-  transform: scale(1.1, 1.1);
+  transform: scale(1.1, 1.2);
 }
 
 .cards:hover > .card:not(:hover) {
-  filter: blur(10px);
-  transform: scale(0.9, 0.9);
+  /* filter: blur(2px); */
+  /* transform: scale(0.9, 0.9); */
 }
