@@ -22,7 +22,7 @@ function Home() {
   };
 
   useEffect(() => {
-    let token = localStorage.getItem("token");
+    // let token = localStorage.getItem("token");
     const LoggedIn = async()=>{
       try{
         await isLoggedIn() //calling this here so to set userData stateVariable
@@ -45,8 +45,11 @@ function Home() {
         }
        
       };
-      LoggedIn()
-      fetchHistory();
+      const run = async()=>{
+        await LoggedIn();
+        await fetchHistory();
+      }
+      run()
     } catch (e) {
       console.log("history not found:", e);
     }
@@ -137,4 +140,4 @@ function Home() {
   );
 }
 
-export default withAuth(Home);
+export default Home;

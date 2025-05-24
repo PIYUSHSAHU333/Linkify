@@ -11,12 +11,10 @@ import { AuthContext } from "../context/AuthContext";
 import PriceSection from "../Sections/PriceSection";
 import FAQ from "../Sections/FAQ";
 import { HoverButton } from "../ui/LogInBtn";
-
-// import { Footer } from "../ui/Footer";
-// import { Fab } from "@mui/material";
+import RevealOnScroll from "../ui/RevealOnScroll";
 import BeamsBackground from "../ui/BackgroundBeams";
 function LandingPage() {
-  const router = useNavigate()
+  const router = useNavigate();
   const { isLoggedIn, userData } = useContext(AuthContext);
   useEffect(() => {
     let token = localStorage.getItem("token");
@@ -39,10 +37,10 @@ function LandingPage() {
             <Link to="FeatureSection" smooth={true} duration={500}>
               Features
             </Link>
-            <Link to="FAQ" smooth={true} duration={500}>
+            <Link to="FAQ" smooth={true} duration={700}>
               FAQ
             </Link>
-            <Link to="Footer" smooth={true} duration={500}>
+            <Link to="Footer" smooth={true} duration={800}>
               Contact
             </Link>
           </div>
@@ -51,7 +49,7 @@ function LandingPage() {
               <HoverButton
                 onClick={() => {
                   localStorage.removeItem("token");
-                  router("/")
+                  router("/");
                 }}
               >
                 Logout
@@ -63,11 +61,21 @@ function LandingPage() {
             )}
           </div>
         </div>
-        <HeroSection />
-        <FeatureSection />
-        <Testimony />
-        <PriceSection />
-        <FAQ />
+        <RevealOnScroll>
+          <HeroSection />
+        </RevealOnScroll>
+        <RevealOnScroll>
+          <FeatureSection />
+        </RevealOnScroll>
+        <RevealOnScroll>
+          <Testimony />
+        </RevealOnScroll>
+        <RevealOnScroll>
+          <PriceSection />
+        </RevealOnScroll>
+        <RevealOnScroll>
+          <FAQ />
+        </RevealOnScroll>
       </div>
     </div>
   );

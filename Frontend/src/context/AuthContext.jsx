@@ -11,7 +11,7 @@ const client = axios.create({
 export const AuthProvider = ({ children }) => {
   const authContext = useContext(AuthContext);
 
-  const router = useNavigate()
+  const router = useNavigate();
   const [userData, setUserData] = useState();
 
   const handleRegister = async (username, name, password) => {
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
         name: name,
         password: password,
       });
-  
+
       if (request.status === httpStatus.CREATED) {
         return request.data.message;
       }
@@ -40,64 +40,72 @@ export const AuthProvider = ({ children }) => {
       if (request.status === httpStatus.OK && request.data.token) {
         localStorage.setItem("token", request.data.token);
         router("/home");
-        console.log("token stored:",localStorage.getItem("token"));
-      }else{
-        console.log("token missing")
+        console.log("token stored:", localStorage.getItem("token"));
+      } else {
+        console.log("token missing");
       }
     } catch (err) {
       throw err;
     }
   };
 
-  const getUserHistory =async ()=>{
-    console.log("user data:",userData)
-    try{
-     let request = await client.get("/getMeetingHistory", {
+  const getUserHistory = async () => {
+    console.log("user data:", userData);
+    try {
+      let request = await client.get("/getMeetingHistory", {
         params: {
-          userId : userData.userId
-        }
-      }) 
-      return request.data
-    }catch(e){
-      throw e
+          userId: userData.userId,
+        },
+      });
+      return request.data;
+    } catch (e) {
+      throw e;
     }
-  }
-  const addToHistory = async (meetingCode)=>{
-    try{
+  };
+  const addToHistory = async (meetingCode) => {
+    try {
       let request = await client.post("/addMeetingHistory", {
         token: localStorage.getItem("token"),
         userId: userData._id,
-        meetingCode: meetingCode
-      })
+        meetingCode: meetingCode,
+      });
       console.log(request.data.message);
-      return request 
-    }catch(e){
-        throw e
+      return request;
+    } catch (e) {
+      throw e;
     }
-  }
+  };
 
-  const isLoggedIn = async()=>{
-    try{
+  const isLoggedIn = async () => {
+    try {
       let token = localStorage.getItem("token");
-      // console.log("token from inside of isLogged in",token)
-      if(token){
-
-       const request = await client.get("/verifyUser", {
-          headers: {Authorization: `Bearer ${token}`}
+      if (token) {
+        const request = await client.get("/verifyUser", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         setUserData(request.data.user);
-      }else{
+      } else {
         // setUserData(null)
-        return
+        return;
       }
-    }catch(e){
-      console.log("error from isLoggedIn:", e)
-      setUserData(null)
+    } catch (e) {
+      console.log("error from isLoggedIn:", e);
+      setUserData(null);
     }
-  }
+  };
   return (
     <>
-      <AuthContext.Provider value={{ handleRegister,getUserHistory, isLoggedIn, addToHistory ,handleLogin, userData, setUserData }}>
+      <AuthContext.Provider
+        value={{
+          handleRegister,
+          getUserHistory,
+          isLoggedIn,
+          addToHistory,
+          handleLogin,
+          userData,
+          setUserData,
+        }}
+      >
         {children}
       </AuthContext.Provider>
     </>

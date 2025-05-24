@@ -11,7 +11,7 @@ import MicOffIcon from "@mui/icons-material/MicOff";
 import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
 import styles from "../Styles/VideoComponent.module.css";
 import io from "socket.io-client";
-
+import withAuth from "../utils/withAuth";
 import { Input } from "postcss";
 var connections = {};
 
@@ -487,7 +487,7 @@ function VideoMeetingComponent() {
   };
   let handleEndCall = () => {
     localStorage.removeItem("username");
-    localStorage.clear();
+
     try {
       let tracks = localVideoRef.current.srcObject.getTracks();
       tracks.forEach((track) => track.stop());

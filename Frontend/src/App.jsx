@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 import VideoMeetingComponent from "./page/VideoComponent";
 import Home from "./page/Home";
 import FooterDemo from "./ui/Footer";
+import PrivateRoute from "./utils/PrivateRoute";
 function App() {
   return (
     <>
@@ -15,8 +16,8 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<Authentication />} />
-          <Route path="/:url" element={<VideoMeetingComponent/>} />
-          <Route path="/home" element={<Home/>}/>
+          <Route path="/:url" element={<PrivateRoute><VideoMeetingComponent/></PrivateRoute>} />
+          <Route path="/home" element={<PrivateRoute><Home/></PrivateRoute>}/>
          </Routes>
           <FooterDemo/>
         </AuthProvider>
