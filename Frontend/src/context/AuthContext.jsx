@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
     try {
       let request = await client.post("/addMeetingHistory", {
         token: localStorage.getItem("token"),
-        userId: userData._id,
+        userId: userData.userId,
         meetingCode: meetingCode,
       });
       console.log(request.data.message);

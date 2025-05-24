@@ -33,7 +33,7 @@ function PriceSection() {
           l3={"File Sharing"}
         />
         <PricingCard
-          h1={"Buisness Plan"}
+          h1={"Freelance Plan"}
           price={"4$"}
           p={"Essential features built for solo creators and consultants."}
           l1={5}

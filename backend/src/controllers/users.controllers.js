@@ -56,18 +56,19 @@ const login = async (req, res) => {
 };
 
 const history = async (req, res, next) => {
-  console.log("history hit");
+  
   const { userId } = req.query;
 
   const user = await User.findById(userId);
   const Meetinghistory = await Meeting.find({ user_id: user._id });
+  console.log("meetingHistory:",Meetinghistory);
 
   res.json(Meetinghistory);
 };
 
 const addHistory = async (req, res, next) => {
   const { token, meetingCode, userId } = req.body;
-  const user = await User.findById({ userId });
+  const user = await User.findById( userId );
   const newMeeting = new Meeting({
     user_id: user._id,
     meetingCode: meetingCode,
