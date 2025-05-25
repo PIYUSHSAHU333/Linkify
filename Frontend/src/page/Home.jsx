@@ -20,7 +20,13 @@ function Home() {
     console.log("history from join btn:", history);
     navigate(`/${meetingCode}`);
   };
-
+  function formatDate(dateString){
+      const date = new Date(dateString);
+      let day = date.getDay().toString().padStart(2, "0");
+      let month = (date.getMonth()+1).toString().padStart(2, "0");
+      let year = date.getFullYear();
+      return `${day}/${month}/${year}`
+    }
   useEffect(() => {
     try {
       const checkLogin = async () => {
@@ -61,7 +67,10 @@ function Home() {
             <HistoryIcon /> History
           </Link>
           <Link>Contact</Link>
-          <LogoutBtn />
+          <LogoutBtn onClick={()=>{
+            localStorage.removeItem("token");
+            navigate("/")
+          }} />
         </div>
       </div>
 
@@ -74,7 +83,7 @@ function Home() {
              
                   <div key={e._id} class="card blue">
                     <p className="tip">Code: {e.meetingCode}</p>
-                    <p className="second-text ">Date: {e.date}</p>
+                    <p className="second-text ">Date: {formatDate(e.date)}</p>
                   </div>
                 
               );

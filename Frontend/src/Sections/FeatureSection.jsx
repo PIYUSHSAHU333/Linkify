@@ -29,7 +29,7 @@ function FeatureSection() {
             </p>
           </div>
         </div>
-        <div className="flex gap-3.5 ">
+        <div className="flex gap-3.5 border-2 h-[200px] rounded-xl p-3.5 border-[#AB1B9E]">
           <HistoryIcon className="text-amber-100  !size-10" />
 
           <div>
@@ -40,7 +40,7 @@ function FeatureSection() {
             </p>
           </div>
         </div>
-        <div className="flex gap-3.5 ">
+        <div className="flex gap-3.5 border-2 rounded-xl p-3.5 border-[#AB1B9E] ">
           <ScreenShareIcon className="text-amber-100  !size-10" />
 
           <div>

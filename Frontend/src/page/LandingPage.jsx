@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { Link } from "react-scroll";
 import { useNavigate } from "react-router-dom";
@@ -13,8 +13,11 @@ import FAQ from "../Sections/FAQ";
 import { HoverButton } from "../ui/LogInBtn";
 import RevealOnScroll from "../ui/RevealOnScroll";
 import BeamsBackground from "../ui/BackgroundBeams";
+import Button from "@mui/material/Button";
 function LandingPage() {
   const router = useNavigate();
+  const [guest, setGuest] = useState(false);
+  const [meetingCode, setMeetingcode] = useState("")
   const { isLoggedIn, userData } = useContext(AuthContext);
   useEffect(() => {
     let token = localStorage.getItem("token");
@@ -22,6 +25,13 @@ function LandingPage() {
     isLoggedIn();
   }, []);
 
+  function joinGuest(){
+    setGuest(!guest)
+  }
+  function handleJoinCall(){
+    router(`/guest/${meetingCode}`)
+  }
+  
   return (
     <div className=" min-h-screen ">
       <div className="fixed inset-0 -z-10">
@@ -33,7 +43,7 @@ function LandingPage() {
             Linkify
           </div>
           <div className="navLink cursor-pointer font-semibold text-xl flex items-center gap-11 justify-between">
-            <Link>Join as guest</Link>
+            <Link onClick={joinGuest}>Join as guest</Link>
             <Link to="FeatureSection" smooth={true} duration={500}>
               Features
             </Link>
@@ -61,6 +71,23 @@ function LandingPage() {
             )}
           </div>
         </div>
+        {
+          guest ? <div className="enterCode rounded-2xl w-1/4 left-[410px]  h-fit p-1.5 absolute bg-[rgba(200,162,200,0.5)]">
+            <form onSubmit={(e)=>{
+              e.preventDefault();
+              handleJoinCall()
+            }} className="flex flex-col justify-center items-center">
+              <label htmlFor="code">Enter meeting code</label>
+                <input id="code" className="border-2 mb-2 rounded-2xl p-2.5 border-[#000]" type="text" value={meetingCode} onChange={(e)=>{
+              setMeetingcode(e.target.value)
+            }} />
+            <Button role="submit"  className="w-1/5 !bg-[#AB1B9E] relative left-1" variant="contained" >
+              join
+            </Button>
+            </form>
+            
+          </div> : <></>
+        }
         <RevealOnScroll>
           <HeroSection />
         </RevealOnScroll>
