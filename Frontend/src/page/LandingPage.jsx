@@ -18,7 +18,7 @@ function LandingPage() {
   const router = useNavigate();
   const [guest, setGuest] = useState(false);
   const [meetingCode, setMeetingcode] = useState("")
-  const { isLoggedIn, userData } = useContext(AuthContext);
+  const { isLoggedIn, userData, setUserData } = useContext(AuthContext);
   useEffect(() => {
     let token = localStorage.getItem("token");
     console.log("token from landing page:", token);
@@ -59,7 +59,8 @@ function LandingPage() {
               <HoverButton
                 onClick={() => {
                   localStorage.removeItem("token");
-                  router("/");
+                  setUserData(null)
+                  
                 }}
               >
                 Logout

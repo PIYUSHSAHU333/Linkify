@@ -8,35 +8,25 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 function Home() {
-  const { isLoggedIn } = useContext(AuthContext);
   const navigate = useNavigate();
   const [meetingCode, setMeetingCode] = useState("");
   const [historyOpen, setHistoryOpen] = useState(false);
   const [meetingHistory, setMeetingHistory] = useState([]);
-  const { getUserHistory, addToHistory, userData } = useContext(AuthContext);
+  const { getUserHistory, addToHistory, userData, setUserData } =
+    useContext(AuthContext);
   const handleJoinCall = async () => {
     await addToHistory(meetingCode);
     let history = await getUserHistory();
     console.log("history from join btn:", history);
     navigate(`/${meetingCode}`);
   };
-  function formatDate(dateString){
-      const date = new Date(dateString);
-      let day = date.getDay().toString().padStart(2, "0");
-      let month = (date.getMonth()+1).toString().padStart(2, "0");
-      let year = date.getFullYear();
-      return `${day}/${month}/${year}`
-    }
-  useEffect(() => {
-    try {
-      const checkLogin = async () => {
-        await isLoggedIn();
-      };
-      checkLogin();
-    } catch (e) {
-      console.log("isLoggedIn failed:", e);
-    }
-  }, []);
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    let day = date.getDay().toString().padStart(2, "0");
+    let month = (date.getMonth() + 1).toString().padStart(2, "0");
+    let year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -67,10 +57,14 @@ function Home() {
             <HistoryIcon /> History
           </Link>
           <Link>Contact</Link>
-          <LogoutBtn onClick={()=>{
-            localStorage.removeItem("token");
-            navigate("/")
-          }} />
+          <LogoutBtn
+            onClick={() => {
+              localStorage.removeItem("token");
+              setUserData(null);
+              console.log("Navigate to /")
+              navigate("/");
+            }}
+          />
         </div>
       </div>
 
@@ -80,12 +74,10 @@ function Home() {
             meetingHistory.map((e, i) => {
               console.log(e);
               return (
-             
-                  <div key={e._id} class="card blue">
-                    <p className="tip">Code: {e.meetingCode}</p>
-                    <p className="second-text ">Date: {formatDate(e.date)}</p>
-                  </div>
-                
+                <div key={e._id} class="card blue">
+                  <p className="tip">Code: {e.meetingCode}</p>
+                  <p className="second-text ">Date: {formatDate(e.date)}</p>
+                </div>
               );
             })
           ) : (
@@ -109,7 +101,13 @@ function Home() {
             real-time chat, and easy one-click join, anytime, anywhere.
           </p>
           <div className=" mt-5 ">
-            <form onSubmit={ (e)=>{e.preventDefault(); handleJoinCall()}} className="flex flex-col gap-2">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleJoinCall();
+              }}
+              className="flex flex-col gap-2"
+            >
               <label htmlFor="meetingCode" className="text-amber-50">
                 Enter Meeting code
               </label>

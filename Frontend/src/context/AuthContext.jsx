@@ -1,7 +1,7 @@
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 import axios from "axios";
 import httpStatus from "http-status";
-import { data, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 export const AuthContext = createContext({});
 
 const client = axios.create({
@@ -9,11 +9,12 @@ const client = axios.create({
 });
 
 export const AuthProvider = ({ children }) => {
-  const authContext = useContext(AuthContext);
-
   const router = useNavigate();
   const [userData, setUserData] = useState();
-
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    isLoggedIn();
+  }, []);
   const handleRegister = async (username, name, password) => {
     try {
       const request = await client.post("/register", {
@@ -39,6 +40,8 @@ export const AuthProvider = ({ children }) => {
 
       if (request.status === httpStatus.OK && request.data.token) {
         localStorage.setItem("token", request.data.token);
+        await isLoggedIn();
+        console.log("handleLogin");
         router("/home");
         console.log("token stored:", localStorage.getItem("token"));
       } else {
@@ -85,12 +88,13 @@ export const AuthProvider = ({ children }) => {
         });
         setUserData(request.data.user);
       } else {
-        // setUserData(null)
         return;
       }
     } catch (e) {
       console.log("error from isLoggedIn:", e);
       setUserData(null);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -104,6 +108,7 @@ export const AuthProvider = ({ children }) => {
           handleLogin,
           userData,
           setUserData,
+          loading,
         }}
       >
         {children}
