@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const router = useNavigate();
   const [userData, setUserData] = useState();
   const [loading, setLoading] = useState(true);
+   const [logoutinProgress, setLogoutinProgress] = useState(false)
   useEffect(() => {
     isLoggedIn();
   }, []);
@@ -97,6 +98,20 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
+
+  const logOut = async()=>{
+    
+      
+      localStorage.removeItem("token");
+      router("/");
+      setTimeout(()=>{
+        setUserData(null);
+      }, 500)
+      
+      
+    
+    
+  }
   return (
     <>
       <AuthContext.Provider
@@ -109,6 +124,8 @@ export const AuthProvider = ({ children }) => {
           userData,
           setUserData,
           loading,
+          logoutinProgress, 
+          logOut        
         }}
       >
         {children}

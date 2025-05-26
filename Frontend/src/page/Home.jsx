@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import withAuth from "../utils/withAuth";
 import LogoutBtn from "../ui/LogOutBtn";
 import HistoryIcon from "@mui/icons-material/History";
 import Button from "@mui/material/Button";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-
+import {Link } from "react-scroll"
 function Home() {
   const navigate = useNavigate();
   const [meetingCode, setMeetingCode] = useState("");
   const [historyOpen, setHistoryOpen] = useState(false);
   const [meetingHistory, setMeetingHistory] = useState([]);
-  const { getUserHistory, addToHistory, userData, setUserData } =
+  const { getUserHistory, addToHistory, userData, setUserData, logOut } =
     useContext(AuthContext);
+ 
   const handleJoinCall = async () => {
     await addToHistory(meetingCode);
     let history = await getUserHistory();
@@ -56,13 +57,10 @@ function Home() {
           >
             <HistoryIcon /> History
           </Link>
-          <Link>Contact</Link>
+          <Link to="Footer" smooth={true} duration={700}>Contact</Link>
           <LogoutBtn
             onClick={() => {
-              localStorage.removeItem("token");
-              setUserData(null);
-              console.log("Navigate to /")
-              navigate("/");
+             logOut()
             }}
           />
         </div>

@@ -270,6 +270,9 @@
 .homeComp {
   background: linear-gradient(135deg, #15054e, #513380);
 }
+.authentication{
+  background: linear-gradient(135deg, #15054e, #513380);
+}
 .cards {
   transition: all;
   position: absolute;

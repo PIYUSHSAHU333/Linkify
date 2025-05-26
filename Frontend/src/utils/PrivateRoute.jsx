@@ -2,10 +2,10 @@ import React, { useContext, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 function PrivateRoute({ children }) {
-  const {userData, loading} = useContext(AuthContext)
+  const {userData, loading, logoutinProgress} = useContext(AuthContext)
   const navigate = useNavigate();
 
-  if(loading){
+  if(loading || logoutinProgress){
     return  <div className="min-h-screen ">Please wait a while</div>
   }
 

@@ -43,14 +43,14 @@ function LandingPage() {
             Linkify
           </div>
           <div className="navLink cursor-pointer font-semibold text-xl flex items-center gap-11 justify-between">
-            <Link onClick={joinGuest}>Join as guest</Link>
-            <Link to="FeatureSection" smooth={true} duration={500}>
+            <Link onClick={joinGuest} className=" hover:text-[#AB1B9E]">Join as guest</Link>
+            <Link to="FeatureSection"  className=" hover:text-[#AB1B9E]" smooth={true} duration={500}>
               Features
             </Link>
-            <Link to="FAQ" smooth={true} duration={700}>
+            <Link to="FAQ" className=" hover:text-[#AB1B9E]" smooth={true} duration={700}>
               FAQ
             </Link>
-            <Link to="Footer" smooth={true} duration={800}>
+            <Link to="Footer" className=" hover:text-[#AB1B9E]" smooth={true} duration={800}>
               Contact
             </Link>
           </div>
