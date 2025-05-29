@@ -1,8 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { Facebook, Instagram, Linkedin, Moon, Send, Sun, Twitter } from 'lucide-react';
+import { Instagram, Linkedin, Moon, Send, Sun, Twitter } from 'lucide-react';
 
 function FooterDemo() {
   const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const socialLinks = [
+    {
+      icon: Twitter,
+      name: 'X (Twitter)',
+      href: 'https://twitter.com/piyushsahuys',
+      tooltip: 'piyushsahuys'
+    },
+    {
+      icon: Instagram,
+      name: 'Instagram',
+      href: 'https://instagram.com/godsplay39',
+      tooltip: '@godsplay39'
+    },
+    {
+      icon: Linkedin,
+      name: 'LinkedIn',
+      href: 'https://www.linkedin.com/in/piyush-sahu-57b43b359/',
+      tooltip: 'Piyush Sahu'
+    }
+  ];
 
   useEffect(() => {
     if (isDarkMode) {
@@ -62,20 +83,25 @@ function FooterDemo() {
           <div className="relative">
             <h3 className="mb-4 text-lg font-semibold">Follow Us</h3>
             <div className="mb-6 flex space-x-4">
-              {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
-                <button
-                  key={i}
-                  className="rounded-full border p-2 hover:bg-primary hover:text-white transition-colors"
+              {socialLinks.map(({ icon: Icon, name, href, tooltip }) => (
+                <a
+                  key={name}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative rounded-full border p-2 hover:bg-[#AB1B9E] hover:text-white transition-colors"
                 >
                   <div className='cursor-pointer'>
-                  <Icon className="h-4 w-4" />
-                  <span className="sr-only">{Icon.name}</span>
+                    <Icon className="h-4 w-4" />
+                    <span className="sr-only">{name}</span>
                   </div>
-                  
-                </button>
+                  {/* Tooltip */}
+                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#26193A] text-amber-100 px-2 py-1 rounded text-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    {tooltip}
+                  </div>
+                </a>
               ))}
             </div>
-            
           </div>
         </div>
 

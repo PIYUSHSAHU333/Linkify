@@ -1,7 +1,7 @@
 import { User } from "../models/users.model.js";
 import httpstatus from "http-status";
 import crypto from "crypto";
-import bcrypt, { hash } from "bcrypt";
+import bcrypt from "bcrypt";
 import { Meeting } from "../models/meetings.model.js";
 import jwt from "jsonwebtoken";
 import { ExpressErr } from "../utils/ExpressErr.js";
@@ -15,7 +15,7 @@ const register = async (req, res) => {
       .json({ message: "Username already exists" });
   }
 
-  const hashedPassword = await brycpt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = new User({
     name: name,

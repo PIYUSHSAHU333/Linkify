@@ -20,7 +20,7 @@ export default function BeamsBackground({ className = "", intensity = "medium" }
     const canvasRef = useRef(null);
     const beamsRef = useRef([]);
     const animationFrameRef = useRef(0);
-    const MINIMUM_BEAMS = 10; // reduced for performance
+    const MINIMUM_BEAMS = 10; 
 
     const opacityMap = {
         subtle: 0.6,
@@ -38,14 +38,14 @@ export default function BeamsBackground({ className = "", intensity = "medium" }
         let height = window.innerHeight;
 
         const updateCanvasSize = () => {
-            const dpr = Math.min(1.5, window.devicePixelRatio || 1); // limit high-res drain
+            const dpr = Math.min(1.5, window.devicePixelRatio || 1);
             width = window.innerWidth;
             height = window.innerHeight;
             canvas.width = width * dpr;
             canvas.height = height * dpr;
             canvas.style.width = `${width}px`;
             canvas.style.height = `${height}px`;
-            ctx.setTransform(1, 0, 0, 1, 0, 0); // reset before scale
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.scale(dpr, dpr);
 
             beamsRef.current = Array.from({ length: MINIMUM_BEAMS }, () =>
@@ -125,11 +125,11 @@ export default function BeamsBackground({ className = "", intensity = "medium" }
     }, [intensity]);
 
     return (
-        <div className={`relative min-h-screen w-full overflow-hidden bg-neutral-950 ${className}`}>
+        <div className={`fixed inset-0 min-h-screen w-full overflow-hidden bg-neutral-950 ${className}`}>
             <canvas
                 ref={canvasRef}
-                className="absolute inset-0"
-                style={{ filter: "blur(5px)" }} // lower canvas blur
+                className="fixed inset-0 w-full h-full"
+                style={{ filter: "blur(5px)" }} 
             />
         </div>
     );

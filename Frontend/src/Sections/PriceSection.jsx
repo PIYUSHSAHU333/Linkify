@@ -2,19 +2,19 @@ import React from "react";
 import PricingCard from "../ui/PricingCard";
 function PriceSection() {
   return (
-    <div className="priceSection flex-col w-8/10 mx-auto items-center justify-center flex min-h-screen">
+    <div className="priceSection flex-col w-full md:w-8/10 mx-auto items-center justify-center flex min-h-screen px-4 md:px-0">
       <div className="flex flex-col items-center">
         <div className="feature-glow"></div>
-        <p className="text-[#F083E7] text-2xl font-bold z-20">Pricing</p>
-        <h1 className="text-6xl text-amber-100 z-20 font-bold w-[650px] text-center">
+        <p className="text-[#F083E7] text-xl md:text-2xl font-bold z-20">Pricing</p>
+        <h1 className="text-3xl md:text-6xl text-amber-100 z-20 font-bold w-full md:w-[650px] text-center">
           Pricing that grows with you
         </h1>
-        <p className="text-2xl w-[670px] font-medium text-center mt-8 text-gray-200">
+        <p className="text-lg md:text-2xl w-full md:w-[670px] font-medium text-center mt-4 md:mt-8 text-gray-200">
           Transparent, flexible pricing built to scale with your needs — no
           hidden fees, no surprises, just value.
         </p>
       </div>
-      <div className="pricingCards grid grid-cols-3 gap-x-7 mt-15">
+      <div className="pricingCards grid grid-cols-1 md:grid-cols-3 gap-y-8 md:gap-y-0 gap-x-0 md:gap-x-7 mt-8 md:mt-15">
         <PricingCard
           h1={"Buisness Plan"}
           price={"20$"}
@@ -23,7 +23,7 @@ function PriceSection() {
           l3={"Dedicated account manager"}
         />
         <PricingCard
-          className="transform scale-108"
+          className="transform md:scale-108"
           h1={"Startup Plan"}
           price={"12$"}
           p={

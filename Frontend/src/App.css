@@ -33,6 +33,11 @@
   box-shadow: 8px 8px 20px rgba(171, 27, 158, 0.3);
   border: solid 20px rgba(255, 255, 255, 0.2);
 }
+.userVideo{
+  box-shadow: 8px 8px 25px rgba(171, 27, 158, 0.3);
+  border: solid 15px rgba(255, 255, 255, 0.2);
+  width: fit-content;
+}
 .meetingImg::before {
   content: "";
   position: absolute;
@@ -273,6 +278,9 @@
 .authentication{
   background: linear-gradient(135deg, #15054e, #513380);
 }
+.lobby{
+  background: linear-gradient(135deg, #15054e, #513380) ;
+}
 .cards {
   transition: all;
   position: absolute;
@@ -287,6 +295,30 @@
   overflow-y: auto;
   max-height: 600px;
   gap: 15px;
+}
+@media (max-width: 640px) {
+  .cards{
+    position: absolute;
+    right: 200px;
+    top: 150px;
+  }
+}
+@media (min-width: 640px) {
+  .cards{
+    transition: all;
+  position: absolute;
+  right: 290px;
+  top: 50px;
+  display: flex;
+  border: solid 4px rgba(171, 27, 158, 0.5);
+  background-color: rgba(171, 27, 158, 0.5);
+  border-radius: 20px;
+  padding: 20px;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 600px;
+  gap: 15px;
+  }
 }
 
 .cards .blue {
@@ -325,4 +357,161 @@
 .cards:hover > .card:not(:hover) {
   /* filter: blur(2px); */
   /* transform: scale(0.9, 0.9); */
+}
+
+/* Custom Hamburger Menu */
+.hamburger-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.hamburger-line {
+  width: 2rem;
+  height: 0.25rem;
+  background: #fef3c7;
+  border-radius: 10px;
+  transition: all 0.3s linear;
+  position: relative;
+  transform-origin: 1px;
+}
+
+.hamburger-menu.open .hamburger-line:first-child {
+  transform: rotate(45deg);
+  background: #AB1B9E;
+}
+
+.hamburger-menu.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.hamburger-menu.open .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg);
+  background: #AB1B9E;
+}
+
+/* Mobile Menu Animation */
+.mobile-menu-enter {
+  transform: translateX(100%);
+}
+
+.mobile-menu-enter-active {
+  transform: translateX(0);
+  transition: transform 300ms ease-in-out;
+}
+
+.mobile-menu-exit {
+  transform: translateX(0);
+}
+
+.mobile-menu-exit-active {
+  transform: translateX(100%);
+  transition: transform 300ms ease-in-out;
+}
+
+/* Mobile Sidebar Glassmorphism */
+.mobile-sidebar {
+  background: linear-gradient(135deg, rgba(81, 51, 128, 0.4), rgba(171, 27, 158, 0.25));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: -10px 0 20px rgba(171, 27, 158, 0.1);
+}
+
+.mobile-sidebar-link {
+  position: relative;
+  transition: all 0.3s ease;
+  background: linear-gradient(90deg, transparent, rgba(171, 27, 158, 0.1));
+  background-size: 200% 100%;
+  background-position: 100% 0;
+}
+
+.mobile-sidebar-link:hover {
+  background-position: 0 0;
+  transform: translateX(10px);
+}
+
+/* Hamburger Menu Styles */
+.hamburger-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 60;
+}
+
+.hamburger-line {
+  width: 2rem;
+  height: 0.25rem;
+  background: #fef3c7;
+  border-radius: 10px;
+  transition: all 0.3s linear;
+  position: relative;
+  transform-origin: 1px;
+}
+
+.hamburger-menu.open .hamburger-line:first-child {
+  transform: rotate(45deg);
+  background: #AB1B9E;
+}
+
+.hamburger-menu.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.hamburger-menu.open .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg);
+  background: #AB1B9E;
+}
+
+/* Typing Animation */
+.typing-text {
+  position: relative;
+  display: inline;
+  color: #AB1B9E;
+}
+
+.typing-text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -4px;
+  width: 2px;
+  height: 100%;
+  background-color: #AB1B9E;
+  animation: blink 0.25s step-end infinite;
+}
+
+.typing-text {
+  clip-path: inset(0 100% 0 0);
+  animation: typing 1.5s steps(20, end) forwards;
+  animation-delay: 1s;
+}
+
+@keyframes typing {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes blink {
+  from, to { opacity: 0 }
+  50% { opacity: 1 }
 }

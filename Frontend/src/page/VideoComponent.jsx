@@ -9,10 +9,12 @@ import ChatIcon from "@mui/icons-material/Chat";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
+import CloseIcon from "@mui/icons-material/Close";
 import styles from "../Styles/VideoComponent.module.css";
 import io from "socket.io-client";
 import withAuth from "../utils/withAuth";
 import { Input } from "postcss";
+import { useNavigate } from "react-router-dom";
 var connections = {};
 
 // Configuration for WebRTC's RTCPeerConnection
@@ -30,10 +32,10 @@ function VideoMeetingComponent() {
   const [askForUsername, setAskForUsername] = useState(true);
   const [username, setUsername] = useState("");
   const [otherUsernames, setOtherUsernames] = useState({});
-  const [videoAvailable, setVideoAvailable] = useState(); //this represents our permission of video or audio from our device
-  const [audioAvailable, setAudioAvailable] = useState();
-  const [audio, setAudio] = useState(); //this represent multiple streams from other users
-  const [video, setVideo] = useState([]); //this will be an array bc there will be streams of multiple users(video confrencing)
+  const [videoAvailable, setVideoAvailable] = useState(true);
+  const [audioAvailable, setAudioAvailable] = useState(true);
+  const [audio, setAudio] = useState();
+  const [video, setVideo] = useState([]);
   const [screenAvailable, setScreenAvailable] = useState();
   let [newMessages, setNewMessages] = useState(0);
   const [showModal, setShowModal] = useState(true);
@@ -45,17 +47,61 @@ function VideoMeetingComponent() {
   var socketRef = useRef();
   let socketIdRef = useRef();
   const videoRef = useRef([]);
-  const bottomRf = useRef(null)
+  const bottomRf = useRef(null);
+  const previewVideoRef = useRef();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let isComponentMounted = true;
+    
+    if (askForUsername) {
+      if (previewVideoRef.current && previewVideoRef.current.srcObject) {
+        try {
+          let tracks = previewVideoRef.current.srcObject.getTracks();
+          tracks.forEach((track) => track.stop());
+        } catch (e) {}
+      }
+
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((stream) => {
+          if (!isComponentMounted) {
+            stream.getTracks().forEach(track => track.stop());
+            return;
+          }
+          window.previewStream = stream;
+          if (previewVideoRef.current) {
+            previewVideoRef.current.srcObject = stream;
+          }
+        })
+        .catch((err) => {
+          console.log("Error accessing media devices:", err);
+          setVideoAvailable(false);
+          setAudioAvailable(false);
+        });
+    }
+
+    return () => {
+      isComponentMounted = false;
+      if (window.previewStream) {
+        window.previewStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [askForUsername]);
+
   let connect = () => {
-    setAskForUsername(false);
-    getMedia();
+    if (username.trim()) {
+      setAskForUsername(false);
+      getMedia();
+    }
   };
 
-  useEffect(()=>{
-      if(bottomRf.current){
-        bottomRf.current.scrollIntoView({behaviour: "smooth"});
-      }
-  }, [messages])
+  useEffect(() => {
+    if (showModal && bottomRf.current) {
+      bottomRf.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [messages, showModal]);
+
   let getDislayMedia = () => {
     if (screen) {
       if (navigator.mediaDevices.getDisplayMedia) {
@@ -233,7 +279,7 @@ function VideoMeetingComponent() {
               let newVideo = {
                 socketId: socketListId,
                 stream: event.stream,
-                autoplay: true, // Auto-play the video as soon as it’s added
+                autoplay: true, // Auto-play the video as soon as it's added
                 playsinline: true, //is useful for mobile devices to play video inline (not full screen)
               };
 
@@ -510,22 +556,36 @@ function VideoMeetingComponent() {
     setScreen(false);
 
     try {
-      let tracks = localVideoRef.current.srcObject.getTracks();
-      tracks.forEach((track) => {
-        track.stop();
-      });
+      // Only attempt to stop tracks if localVideoRef exists and has srcObject
+      if (localVideoRef.current && localVideoRef.current.srcObject) {
+        const tracks = localVideoRef.current.srcObject.getTracks();
+        tracks.forEach((track) => {
+          try {
+            track.stop();
+          } catch (e) {
+            console.log('Error stopping track:', e);
+          }
+        });
+      }
     } catch (e) {
-      console.log(e);
+      console.log('Error stopping screen share:', e);
     }
 
-    let blackSilence = (...args) => {
-      new MediaStream([black(...args), silence()]);
-    };
-    window.localStream = blackSilence();
+    try {
+      // Create blackSilence stream only if we need to set it
+      if (localVideoRef.current) {
+        let blackSilence = (...args) => new MediaStream([black(...args), silence()]);
+        window.localStream = blackSilence();
+        localVideoRef.current.srcObject = window.localStream;
+      }
+    } catch (e) {
+      console.log('Error setting black silence:', e);
+    }
 
-    localVideoRef.current.srcObject = window.localStream;
-
-    getUserMedia();
+    // Only call getUserMedia if we haven't already stopped
+    if (!screen) {
+      getUserMedia();
+    }
   };
 
   let openChat = () => {
@@ -539,50 +599,107 @@ function VideoMeetingComponent() {
     setMessage(e.target.value);
   };
 
+  const handleLogoClick = () => {
+    // Function to stop all tracks in a stream
+    
+    window.location.href = "/home";
+  };
+
   return (
     <>
       <div className="overflow-hidden">
+        <div className={styles.linkifyText} onClick={handleLogoClick}>
+          Linkify
+        </div>
         {askForUsername === true ? (
-          <div>
-            <h2>Enter the lobby</h2>
-            <TextField
-              id="outlined-basic"
-              label="Username"
-              value={username}
-              variant="outlined"
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-            />
-            <Button variant="contained" onClick={connect}>
-              Connect
-            </Button>
-
-            <div>
-              <video ref={localVideoRef} autoPlay muted></video>
+          <div className={styles.usernameModal}>
+            <div className={styles.modalContent}>
+              <div className={styles.previewVideo}>
+                <video
+                  ref={previewVideoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                />
+              </div>
+              <TextField
+                className={styles.usernameInput}
+                label="Enter your name"
+                variant="filled"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                fullWidth
+                InputProps={{
+                  style: { color: '#fef3c7' }
+                }}
+              />
+              <Button
+                className={styles.joinButton}
+                onClick={connect}
+                variant="contained"
+                disabled={!username.trim()}
+              >
+                Join Meeting
+              </Button>
             </div>
           </div>
         ) : (
           <div className={`${styles.meetVideoContainer}`}>
-            {showModal ? (
+            {/* Chatbox Transition Wrapper */}
+            <div
+              aria-hidden={!showModal}
+              style={{
+                position: 'absolute',
+                top: 20,
+                right: 15,
+                height: '95vh',
+                zIndex: 40,
+                pointerEvents: showModal ? 'auto' : 'none',
+                visibility: showModal ? 'visible' : 'hidden',
+                transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s cubic-bezier(0.4,0,0.2,1)',
+                transform: showModal ? 'translateX(0)' : 'translateX(-120%)',
+                opacity: showModal ? 1 : 0,
+                maxWidth: '100vw',
+                width: '360px',
+              }}
+            >
               <div className={`${styles.chatRoom} z-20`}>
-                <div className={`${styles.chatContainer} msgDisplay h-[95%] z-10 pb-[90px] overflow-y-auto`}>
-                  <h1
-                    className="text-4xl rounded-xl p-4 bg-[#26193A] text-[#fff] font-bold"
-                    style={{ width: "100%", borderBottom: "solid 1px black" }}
+                <div className={styles.chatHeader}>
+                  <h3>In-call messages</h3>
+                  <IconButton
+                    aria-label="Close chat"
+                    onClick={() => setShowModal(false)}
+                    style={{
+                      position: 'absolute',
+                      right: 8,
+                      top: 8,
+                      color: '#fff',
+                      background: 'rgba(171, 27, 158, 0.25)',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      borderRadius: '50%',
+                      boxShadow: '0 2px 8px 0 rgba(171, 27, 158, 0.10)',
+                      transition: 'background 0.2s',
+                      cursor: 'pointer',
+                    }}
+                    size="small"
                   >
-                    Chat
-                  </h1>
-
+                    <CloseIcon />
+                  </IconButton>
+                </div>
+                <div className={`${styles.chatContainer} msgDisplay h-[95%] relative z-10 pb-[90px] overflow-y-auto`}>
                   <div className={`${styles.chattingDisplay} pl-1 z-10`}>
                     {messages.length !== 0 ? (
                       messages.map((item, index) => {
-                        // console.log(message);
-
+                        const isSent = item.sender === username;
                         return (
-                          <div className="overflow-hidden msgData flex-wrap rounded-xl bg-[#26193A] p-1 pr-1.5 pb-3.5 mt-2.5 ml-0.5 w-fit min-w-[50px]" style={{ marginBottom: "20px" }} key={index}>
-                            <p className=" rounded-xl text-[#7b58af] " style={{ fontWeight: "bold" }}>{item.sender}</p>
-                            <p className="text-xl font-bold break-words max-w-[400px] text-white">{item.data}</p>
+                          <div
+                            className={`${styles.msgData}${isSent ? ' ' + styles.sent : ''} ml-0.5 mt-2.5`}
+                            style={{ marginBottom: "20px" }}
+                            key={index}
+                          >
+                            <p className="semibold">{item.sender}</p>
+                            <p className=" font-light break-words max-w-[400px]" >{item.data}</p>
                           </div>
                         );
                       })
@@ -593,60 +710,50 @@ function VideoMeetingComponent() {
                     )}
                     <div ref={bottomRf}></div>
                   </div>
-                    </div>
-                  <div className={`${styles.chattingArea} TF z-30 h-fit fixed bg-[#7b58af] bottom-0 border-t-2 pt-7 w-full `}>
-                    <TextField
-                      sx={{
-                        input: { color: "#26193A" }, // input text color
-                        "& label": {
-                          color: "#26193A", // default label color
-                        },
-                        "& label.Mui-focused": {
-                          color: "#26193A", // label color on focus
-                        },
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: "20px",
-                          "& fieldset": {
-                            borderColor: "#26193A",
-                          },
-                          "&:hover fieldset": {
-                            borderColor: "#FFFFFF",
-                          },
-                          "&.Mui-focused fieldset": {
-                            borderColor: "#FFFFFF",
-                          },
-                        },
-                      }}
-                      className="text-white relative left-5 bottom-3 rounded-2xlt"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      id="outlined-basic"
-                      label="Enter Your chat"
-                      variant="outlined"
-                    />
-                    <Button
-                      variant="contained"
-                      sx={{
-                        backgroundColor: "#26193A",
-                        color: "#8A72A8",
+                </div>
+                <div className={styles.chattingArea}>
+                  <TextField
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    id="outlined-basic"
+                    label="Enter Your chat"
+                    variant="outlined"
+                    fullWidth
+                    onKeyDown={e => { if (e.key === 'Enter') sendMessage(); }}
+                    sx={{
+                      input: { color: "#26193A" },
+                      "& label": { color: "#26193A" },
+                      "& label.Mui-focused": { color: "#26193A" },
+                      "& .MuiOutlinedInput-root": {
                         borderRadius: "20px",
-                        textTransform: "none", 
-                        "&:hover": {
-                          backgroundColor: "#8A72A8",
-                          color: "#26193A", 
-                        },
-                      }}
-                      className="relative left-6"
-                      onClick={sendMessage}
-                    >
-                      Send
-                    </Button>
-                  </div>
-                
+                        "& fieldset": { borderColor: "#26193A" },
+                        "&:hover fieldset": { borderColor: "#FFFFFF" },
+                        "&.Mui-focused fieldset": { borderColor: "#FFFFFF" },
+                      },
+                    }}
+                  />
+                  <Button
+                    variant="contained"
+                    sx={{
+                      background: "linear-gradient(45deg, #AB1B9E, #8A72A8)",
+                      color: "#fff",
+                      borderRadius: "50%",
+                      minWidth: "48px",
+                      minHeight: "48px",
+                      marginLeft: "8px",
+                      boxShadow: "none",
+                      "&:hover": {
+                        background: "linear-gradient(45deg, #8A72A8, #AB1B9E)",
+                      },
+                    }}
+                    onClick={sendMessage}
+                    disabled={!message.trim()}
+                  >
+                    <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" /></svg>
+                  </Button>
+                </div>
               </div>
-            ) : (
-              <></>
-            )}
+            </div>
 
             <div className={styles.buttonContainers}>
               <IconButton onClick={handleVideo} style={{ color: "white" }}>
@@ -690,18 +797,15 @@ function VideoMeetingComponent() {
 
             <div className={styles.conferenceView}>
               {videos.map((video) => (
-                <div className={styles.videosContainer} key={video.socketId}>
+                <div className={`${styles.videosContainer} relative`} key={video.socketId}>
                   <video
                     style={{
-                      width: "350px",
+                      width: "fit-content",
                       height: "auto",
                       borderRadius: "20px",
                       margin: "7px",
                     }}
                     data-socket={video.socketId}
-                    // Assign the video DOM element using a callback ref.
-                    // When both the element is mounted and a media stream is available,
-                    // set the stream as the video source so it plays automatically.
                     ref={(ref) => {
                       if (ref && video.stream) {
                         ref.srcObject = video.stream;
@@ -709,10 +813,12 @@ function VideoMeetingComponent() {
                     }}
                     autoPlay
                   ></video>
-
-                  <p className={styles.usernameLabel}>
-                    {otherUsernames[video.socketId] || "Unknown"}
-                  </p>
+                  {/* Username label for other users only, inside the video container */}
+                  {otherUsernames[video.socketId] && otherUsernames[video.socketId] !== username && (
+                    <p className={`${styles.usernameLabel} absolute bottom-0 left-0`}>
+                      {otherUsernames[video.socketId]}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
