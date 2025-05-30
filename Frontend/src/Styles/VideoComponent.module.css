@@ -1,7 +1,7 @@
 .meetVideoContainer {
     position: relative;
     height: 100vh;
-    background: #33244D;
+    background: #26193A;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -35,11 +35,12 @@
     width: fit-content;
     bottom: 0;
     text-align: center;
-    border: solid 1px #26193A;
+    border: 1.5px solid rgba(171, 27, 158, 0.25);
     border-radius: 16px;
     padding: 9px;
     padding-inline: 15px;
-    background-color: #26193A;
+    background: rgba(255,255,255,0.10);
+    backdrop-filter: blur(8px);
     z-index: 30;
 }
 
@@ -52,6 +53,7 @@
         width: 100%;
         border-radius: 0;
         padding: 5px;
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
     }
     .buttonContainers svg {
         font-size: 1.5rem;
@@ -81,11 +83,11 @@
     justify-content: center;
     align-items: center;
     width: fit-content;
-    background-color: #26193A;
+    background: rgba(255,255,255,0.08);
     border-radius: 20px;
-    border: solid 3px #8A72A8;
+    border: 2px solid rgba(171, 27, 158, 0.25);
     z-index: 8;
-
+    backdrop-filter: blur(6px);
 }
 
 .videosContainer video {
@@ -102,10 +104,10 @@
     bottom: 10px;
     left: 20px;
     padding: 5px 10px;
-    background-color: rgba(138, 114, 168, 0.2);
+    background: rgba(171, 27, 158, 0.18);
     backdrop-filter: blur(4px);
     border-radius: 5px;
-    color: white;
+    color: #fef3c7;
     font-weight: 500;
     z-index: 10;
 }
@@ -268,13 +270,18 @@
 
 @media (max-width: 768px) {
     .chatRoom {
-        width: 100%;
-        height: 100vh;
-        right: 0;
-        top: 0;
-        transform: none;
-        border-radius: 0;
-        max-height: none;
+        width: 95vw;
+        max-width: 420px;
+        height: 60vh;
+        border-radius: 18px 18px 18px 18px;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        padding: 0;
+        overflow-x: hidden;
+        right: auto !important;
+        margin: 0 auto;
+        align-self: center;
     }
 
     .chatHeader {
@@ -293,6 +300,40 @@
 
     .msgData {
         max-width: 80%;
+    }
+
+    .chatboxCenterMobile {
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 100;
+        background: none;
+        pointer-events: auto;
+        box-sizing: border-box;
+        max-width: 100vw;
+        overflow-x: hidden;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .chatboxSlideInMobile {
+        animation: chatboxSlideIn 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    .chatboxSlideOutMobile {
+        animation: chatboxSlideOut 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    @keyframes chatboxSlideIn {
+        from { transform: translateX(100%); opacity: 0.7; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes chatboxSlideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0.7; }
     }
 }
 

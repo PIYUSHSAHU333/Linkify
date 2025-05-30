@@ -15,6 +15,7 @@ import io from "socket.io-client";
 import withAuth from "../utils/withAuth";
 import { Input } from "postcss";
 import { useNavigate } from "react-router-dom";
+import useMediaQuery from '@mui/material/useMediaQuery';
 var connections = {};
 
 // Configuration for WebRTC's RTCPeerConnection
@@ -38,7 +39,7 @@ function VideoMeetingComponent() {
   const [video, setVideo] = useState([]);
   const [screenAvailable, setScreenAvailable] = useState();
   let [newMessages, setNewMessages] = useState(0);
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   let [messages, setMessages] = useState([]);
   let [screen, setScreen] = useState();
   let [message, setMessage] = useState("");
@@ -50,6 +51,8 @@ function VideoMeetingComponent() {
   const bottomRf = useRef(null);
   const previewVideoRef = useRef();
   const navigate = useNavigate();
+  const isMobile = useMediaQuery('(max-width:768px)');
+  const [mobileChatboxClosing, setMobileChatboxClosing] = useState(false);
 
   useEffect(() => {
     let isComponentMounted = true;
@@ -605,6 +608,15 @@ function VideoMeetingComponent() {
     window.location.href = "/home";
   };
 
+  // Handle mobile chatbox close with animation
+  const handleMobileChatboxClose = () => {
+    setMobileChatboxClosing(true);
+    setTimeout(() => {
+      setShowModal(false);
+      setMobileChatboxClosing(false);
+    }, 350); // match animation duration
+  };
+
   return (
     <>
       <div className="overflow-hidden">
@@ -645,115 +657,217 @@ function VideoMeetingComponent() {
           </div>
         ) : (
           <div className={`${styles.meetVideoContainer}`}>
-            {/* Chatbox Transition Wrapper */}
-            <div
-              aria-hidden={!showModal}
-              style={{
-                position: 'absolute',
-                top: 20,
-                right: 15,
-                height: '95vh',
-                zIndex: 40,
-                pointerEvents: showModal ? 'auto' : 'none',
-                visibility: showModal ? 'visible' : 'hidden',
-                transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s cubic-bezier(0.4,0,0.2,1)',
-                transform: showModal ? 'translateX(0)' : 'translateX(-120%)',
-                opacity: showModal ? 1 : 0,
-                maxWidth: '100vw',
-                width: '360px',
-              }}
-            >
-              <div className={`${styles.chatRoom} z-20`}>
-                <div className={styles.chatHeader}>
-                  <h3>In-call messages</h3>
-                  <IconButton
-                    aria-label="Close chat"
-                    onClick={() => setShowModal(false)}
-                    style={{
-                      position: 'absolute',
-                      right: 8,
-                      top: 8,
-                      color: '#fff',
-                      background: 'rgba(171, 27, 158, 0.25)',
-                      backdropFilter: 'blur(8px)',
-                      WebkitBackdropFilter: 'blur(8px)',
-                      borderRadius: '50%',
-                      boxShadow: '0 2px 8px 0 rgba(171, 27, 158, 0.10)',
-                      transition: 'background 0.2s',
-                      cursor: 'pointer',
-                    }}
-                    size="small"
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                </div>
-                <div className={`${styles.chatContainer} msgDisplay h-[95%] relative z-10 pb-[90px] overflow-y-auto`}>
-                  <div className={`${styles.chattingDisplay} pl-1 z-10`}>
-                    {messages.length !== 0 ? (
-                      messages.map((item, index) => {
-                        const isSent = item.sender === username;
-                        return (
-                          <div
-                            className={`${styles.msgData}${isSent ? ' ' + styles.sent : ''} ml-0.5 mt-2.5`}
-                            style={{ marginBottom: "20px" }}
-                            key={index}
-                          >
-                            <p className="semibold">{item.sender}</p>
-                            <p className=" font-light break-words max-w-[400px]" >{item.data}</p>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <p className="text-2xl text-white p-1.5 ">
-                        No messages yet :)
-                      </p>
-                    )}
-                    <div ref={bottomRf}></div>
+            {/* Mobile: Only render chatbox if showModal is true */}
+            {(isMobile && (showModal || mobileChatboxClosing)) && (
+              <div className={
+                styles.chatboxCenterMobile + ' ' +
+                (mobileChatboxClosing
+                  ? styles.chatboxSlideOutMobile
+                  : styles.chatboxSlideInMobile)
+              }>
+                <div className={`${styles.chatRoom} z-20`}>
+                  <div className={styles.chatHeader}>
+                    <h3>In-call messages</h3>
+                    <IconButton
+                      aria-label="Close chat"
+                      onClick={handleMobileChatboxClose}
+                      style={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: '#fff',
+                        background: 'rgba(171, 27, 158, 0.25)',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        borderRadius: '50%',
+                        boxShadow: '0 2px 8px 0 rgba(171, 27, 158, 0.10)',
+                        transition: 'background 0.2s',
+                        cursor: 'pointer',
+                      }}
+                      size="small"
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </div>
+                  <div className={`${styles.chatContainer} msgDisplay h-[95%] relative z-10 pb-[90px] overflow-y-auto`}>
+                    <div className={`${styles.chattingDisplay} pl-1 z-10`}>
+                      {messages.length !== 0 ? (
+                        messages.map((item, index) => {
+                          const isSent = item.sender === username;
+                          return (
+                            <div
+                              className={`${styles.msgData}${isSent ? ' ' + styles.sent : ''} ml-0.5 mt-2.5`}
+                              style={{ marginBottom: "20px" }}
+                              key={index}
+                            >
+                              <p className="semibold">{item.sender}</p>
+                              <p className=" font-light break-words max-w-[400px]" >{item.data}</p>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <p className="text-2xl text-white p-1.5 ">
+                          No messages yet :)
+                        </p>
+                      )}
+                      <div ref={bottomRf}></div>
+                    </div>
+                  </div>
+                  <div className={styles.chattingArea}>
+                    <TextField
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      id="outlined-basic"
+                      label="Enter Your chat"
+                      variant="outlined"
+                      fullWidth
+                      onKeyDown={e => { if (e.key === 'Enter') sendMessage(); }}
+                      sx={{
+                        input: { color: "#26193A" },
+                        "& label": { color: "#26193A" },
+                        "& label.Mui-focused": { color: "#26193A" },
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "20px",
+                          "& fieldset": { borderColor: "#26193A" },
+                          "&:hover fieldset": { borderColor: "#FFFFFF" },
+                          "&.Mui-focused fieldset": { borderColor: "#FFFFFF" },
+                        },
+                      }}
+                    />
+                    <Button
+                      variant="contained"
+                      sx={{
+                        background: "linear-gradient(45deg, #AB1B9E, #8A72A8)",
+                        color: "#fff",
+                        borderRadius: "50%",
+                        minWidth: "48px",
+                        minHeight: "48px",
+                        marginLeft: "8px",
+                        boxShadow: "none",
+                        "&:hover": {
+                          background: "linear-gradient(45deg, #8A72A8, #AB1B9E)",
+                        },
+                      }}
+                      onClick={sendMessage}
+                      disabled={!message.trim()}
+                    >
+                      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" /></svg>
+                    </Button>
                   </div>
                 </div>
-                <div className={styles.chattingArea}>
-                  <TextField
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    id="outlined-basic"
-                    label="Enter Your chat"
-                    variant="outlined"
-                    fullWidth
-                    onKeyDown={e => { if (e.key === 'Enter') sendMessage(); }}
-                    sx={{
-                      input: { color: "#26193A" },
-                      "& label": { color: "#26193A" },
-                      "& label.Mui-focused": { color: "#26193A" },
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: "20px",
-                        "& fieldset": { borderColor: "#26193A" },
-                        "&:hover fieldset": { borderColor: "#FFFFFF" },
-                        "&.Mui-focused fieldset": { borderColor: "#FFFFFF" },
-                      },
-                    }}
-                  />
-                  <Button
-                    variant="contained"
-                    sx={{
-                      background: "linear-gradient(45deg, #AB1B9E, #8A72A8)",
-                      color: "#fff",
-                      borderRadius: "50%",
-                      minWidth: "48px",
-                      minHeight: "48px",
-                      marginLeft: "8px",
-                      boxShadow: "none",
-                      "&:hover": {
-                        background: "linear-gradient(45deg, #8A72A8, #AB1B9E)",
-                      },
-                    }}
-                    onClick={sendMessage}
-                    disabled={!message.trim()}
-                  >
-                    <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" /></svg>
-                  </Button>
+              </div>
+            )}
+            {/* Desktop: keep old logic */}
+            {!isMobile && (
+              <div
+                aria-hidden={!showModal}
+                style={{
+                  position: 'absolute',
+                  top: 20,
+                  right: 15,
+                  height: '95vh',
+                  zIndex: 40,
+                  pointerEvents: showModal ? 'auto' : 'none',
+                  visibility: showModal ? 'visible' : 'hidden',
+                  transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s cubic-bezier(0.4,0,0.2,1)',
+                  transform: showModal ? 'translateX(0)' : 'translateX(-120%)',
+                  opacity: showModal ? 1 : 0,
+                  maxWidth: '100vw',
+                  width: '360px',
+                }}
+              >
+                <div className={`${styles.chatRoom} z-20`}>
+                  <div className={styles.chatHeader}>
+                    <h3>In-call messages</h3>
+                    <IconButton
+                      aria-label="Close chat"
+                      onClick={() => setShowModal(false)}
+                      style={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: '#fff',
+                        background: 'rgba(171, 27, 158, 0.25)',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        borderRadius: '50%',
+                        boxShadow: '0 2px 8px 0 rgba(171, 27, 158, 0.10)',
+                        transition: 'background 0.2s',
+                        cursor: 'pointer',
+                      }}
+                      size="small"
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </div>
+                  <div className={`${styles.chatContainer} msgDisplay h-[95%] relative z-10 pb-[90px] overflow-y-auto`}>
+                    <div className={`${styles.chattingDisplay} pl-1 z-10`}>
+                      {messages.length !== 0 ? (
+                        messages.map((item, index) => {
+                          const isSent = item.sender === username;
+                          return (
+                            <div
+                              className={`${styles.msgData}${isSent ? ' ' + styles.sent : ''} ml-0.5 mt-2.5`}
+                              style={{ marginBottom: "20px" }}
+                              key={index}
+                            >
+                              <p className="semibold">{item.sender}</p>
+                              <p className=" font-light break-words max-w-[400px]" >{item.data}</p>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <p className="text-2xl text-white p-1.5 ">
+                          No messages yet :)
+                        </p>
+                      )}
+                      <div ref={bottomRf}></div>
+                    </div>
+                  </div>
+                  <div className={styles.chattingArea}>
+                    <TextField
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      id="outlined-basic"
+                      label="Enter Your chat"
+                      variant="outlined"
+                      fullWidth
+                      onKeyDown={e => { if (e.key === 'Enter') sendMessage(); }}
+                      sx={{
+                        input: { color: "#26193A" },
+                        "& label": { color: "#26193A" },
+                        "& label.Mui-focused": { color: "#26193A" },
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "20px",
+                          "& fieldset": { borderColor: "#26193A" },
+                          "&:hover fieldset": { borderColor: "#FFFFFF" },
+                          "&.Mui-focused fieldset": { borderColor: "#FFFFFF" },
+                        },
+                      }}
+                    />
+                    <Button
+                      variant="contained"
+                      sx={{
+                        background: "linear-gradient(45deg, #AB1B9E, #8A72A8)",
+                        color: "#fff",
+                        borderRadius: "50%",
+                        minWidth: "48px",
+                        minHeight: "48px",
+                        marginLeft: "8px",
+                        boxShadow: "none",
+                        "&:hover": {
+                          background: "linear-gradient(45deg, #8A72A8, #AB1B9E)",
+                        },
+                      }}
+                      onClick={sendMessage}
+                      disabled={!message.trim()}
+                    >
+                      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" /></svg>
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className={styles.buttonContainers}>
               <IconButton onClick={handleVideo} style={{ color: "white" }}>
@@ -778,14 +892,12 @@ function VideoMeetingComponent() {
                 <></>
               )}
 
-              <Badge badgeContent={newMessages} max={999} color="orange">
-                <IconButton
-                  onClick={() => setShowModal(!showModal)}
-                  style={{ color: "white" }}
-                >
-                  <ChatIcon />{" "}
-                </IconButton>
-              </Badge>
+              <IconButton
+                onClick={() => setShowModal(!showModal)}
+                style={{ color: "white" }}
+              >
+                <ChatIcon />
+              </IconButton>
             </div>
 
             <video

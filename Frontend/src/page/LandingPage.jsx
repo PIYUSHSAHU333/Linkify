@@ -33,15 +33,16 @@ function LandingPage() {
     setGuest(!guest);
     if (mobileMenuOpen) setMobileMenuOpen(false);
   }
-  
+
   function handleJoinCall() {
+    console.log("meetingCode", meetingCode);
     router(`/guest/${meetingCode}`);
   }
 
   function toggleMobileMenu() {
     setMobileMenuOpen(!mobileMenuOpen);
   }
-  
+
   return (
     <div className="relative">
       <div className="fixed inset-0 w-full h-full -z-10">
@@ -52,14 +53,41 @@ function LandingPage() {
           <div className="div text-2xl md:text-4xl cursor-pointer pl-4 md:pl-14 font-bold">
             Linkify
           </div>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center justify-between">
             <div className="navLink cursor-pointer font-semibold text-xl flex items-center gap-11">
-              <Link onClick={joinGuest} className="hover:text-[#AB1B9E]">Join as guest</Link>
-              <Link to="FeatureSection" className="hover:text-[#AB1B9E]" smooth={true} duration={500}>Features</Link>
-              <Link to="FAQ" className="hover:text-[#AB1B9E]" smooth={true} duration={700}>FAQ</Link>
-              <Link to="Footer" className="hover:text-[#AB1B9E]" smooth={true} duration={800}>Contact</Link>
+              <button
+                onClick={joinGuest}
+                className="hover:text-[#AB1B9E] cursor-pointer"
+              >
+                Join as guest
+              </button>
+              <Link
+                
+                to="FeatureSection"
+                className="hover:text-[#AB1B9E]"
+                smooth={true}
+                duration={500}
+              >
+                Features
+              </Link>
+              <Link
+                to="FAQ"
+                className="hover:text-[#AB1B9E]"
+                smooth={true}
+                duration={700}
+              >
+                FAQ
+              </Link>
+              <Link
+                to="Footer"
+                className="hover:text-[#AB1B9E]"
+                smooth={true}
+                duration={800}
+              >
+                Contact
+              </Link>
             </div>
           </div>
 
@@ -81,52 +109,56 @@ function LandingPage() {
             )}
           </div>
 
-          {/* Custom Hamburger Menu - Now on the right */}
-          <div className={`${mobileMenuOpen ? 'fixed right-6 top-6 z-[60]' : 'md:hidden pr-4'}`}>
-            <Hamburger onToggle={toggleMobileMenu} />
+          
+          <div
+            className={`${
+              mobileMenuOpen ? "fixed right-6 top-6 z-[60]" : "md:hidden pr-4"
+            }`}
+          >
+            <Hamburger isOpen={mobileMenuOpen} onToggle={toggleMobileMenu} />
           </div>
 
           {/* Mobile Navigation */}
-          <div 
+          <div
             className={`fixed inset-y-0 right-0 w-64 mobile-sidebar transition-transform duration-300 ease-in-out z-50 md:hidden ${
-              mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+              mobileMenuOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
             <div className="flex flex-col gap-8 pt-24 px-6">
-              <Link 
-                onClick={joinGuest} 
+              <button
+                onClick={joinGuest}
                 className="mobile-sidebar-link text-amber-50 hover:text-[#AB1B9E] text-lg p-2 rounded-lg"
               >
                 Join as guest
-              </Link>
-              <Link 
-                to="FeatureSection" 
-                onClick={() => setMobileMenuOpen(false)} 
-                className="mobile-sidebar-link text-amber-50 hover:text-[#AB1B9E] text-lg p-2 rounded-lg" 
-                smooth={true} 
+              </button>
+              <Link
+                to="FeatureSection"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mobile-sidebar-link text-amber-50 hover:text-[#AB1B9E] text-lg p-2 rounded-lg"
+                smooth={true}
                 duration={500}
               >
                 Features
               </Link>
-              <Link 
-                to="FAQ" 
-                onClick={() => setMobileMenuOpen(false)} 
-                className="mobile-sidebar-link text-amber-50 hover:text-[#AB1B9E] text-lg p-2 rounded-lg" 
-                smooth={true} 
+              <Link
+                to="FAQ"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mobile-sidebar-link text-amber-50 hover:text-[#AB1B9E] text-lg p-2 rounded-lg"
+                smooth={true}
                 duration={700}
               >
                 FAQ
               </Link>
-              <Link 
-                to="Footer" 
-                onClick={() => setMobileMenuOpen(false)} 
-                className="mobile-sidebar-link text-amber-50 hover:text-[#AB1B9E] text-lg p-2 rounded-lg" 
-                smooth={true} 
+              <Link
+                to="Footer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mobile-sidebar-link text-amber-50 hover:text-[#AB1B9E] text-lg p-2 rounded-lg"
+                smooth={true}
                 duration={800}
               >
                 Contact
               </Link>
-              
+
               {/* Login/Logout in Sidebar */}
               <div className="mt-4 mobile-sidebar-link p-2 rounded-lg">
                 {userData ? (
@@ -141,8 +173,8 @@ function LandingPage() {
                     Logout
                   </button>
                 ) : (
-                  <RouterLink 
-                    to="/auth" 
+                  <RouterLink
+                    to="/auth"
                     className="text-amber-50 hover:text-[#AB1B9E] text-lg block"
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -156,7 +188,7 @@ function LandingPage() {
 
         {/* Semi-transparent overlay */}
         {mobileMenuOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
             onClick={() => setMobileMenuOpen(false)}
           ></div>
@@ -167,6 +199,7 @@ function LandingPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
+                console.log("meetingCode", meetingCode);
                 handleJoinCall();
               }}
               className="flex flex-col justify-center items-center"
@@ -185,6 +218,7 @@ function LandingPage() {
                 role="submit"
                 className="w-full md:w-1/5 !bg-[#AB1B9E] relative left-1"
                 variant="contained"
+                onClick={handleJoinCall}
               >
                 join
               </Button>

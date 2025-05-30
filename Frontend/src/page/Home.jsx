@@ -25,7 +25,7 @@ function Home() {
   };
   function formatDate(dateString) {
     const date = new Date(dateString);
-    let day = date.getDay().toString().padStart(2, "0");
+    let day = date.getDate().toString().padStart(2, "0");
     let month = (date.getMonth() + 1).toString().padStart(2, "0");
     let year = date.getFullYear();
     return `${day}/${month}/${year}`;
@@ -52,6 +52,14 @@ function Home() {
     };
     fetchHistory();
   }, [userData]);
+
+  // New useEffect to close history when hamburger menu closes
+  useEffect(() => {
+    if (!isOpen && historyOpen) {
+      setHistoryOpen(false);
+    }
+  }, [isOpen, historyOpen]); // Dependencies: isOpen and historyOpen
+
   return (
     <div className="homeComp md:overflow-y-auto  overflow-x-hidden flex flex-col min-h-screen">
       <div className="navBar hidden cursor-pointer text-amber-100 p-2 sm:flex justify-between items-center">
@@ -125,19 +133,23 @@ function Home() {
       )}
 
       {historyOpen ? (
-        <div className="cards">
+        <div className="cards flex flex-col items-center ">
           {meetingHistory.length > 0 ? (
             meetingHistory.map((e, i) => {
               console.log(e);
               return (
-                <div key={e._id} class="card blue">
+                <div
+                  key={e._id}
+                  className="card blue "
+                  style={{ boxSizing: 'border-box', width: '90vw', maxWidth: 340, margin: '0 auto' }}
+                >
                   <p className="tip">Code: {e.meetingCode}</p>
                   <p className="second-text ">Date: {formatDate(e.date)}</p>
                 </div>
               );
             })
           ) : (
-            <div className="card blue ">
+            <div className="card blue mb-4" style={{ width: '90vw', maxWidth: 340, margin: '0 auto' }}>
               <p className="tip">No meeting history</p>
             </div>
           )}
@@ -146,7 +158,7 @@ function Home() {
         <></>
       )}
 
-      <div className="contentContainer sm:mt-0 mt-16  p-5 flex text-center justify-center sm:justify-between items-center">
+      <div className="contentContainer sm:mt-0 mt-1 p-5 flex text-center justify-center sm:justify-between items-center">
         <div className="p-8">
           <h1 className="text-6xl font-bold text-[#AB1B9E]">
             The Best Video <br /> Confrencing Tool
@@ -162,10 +174,11 @@ function Home() {
                 e.preventDefault();
                 handleJoinCall();
               }}
-              className="flex flex-col items-center gap-y-2 relative  "
+              className="flex flex-col items-center gap-y-2 relative"
+              style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
             >
               <label htmlFor="meetingCode" className="text-amber-50  ">
-                Enter Meeting code
+                Enter Meeting code or create new meeting
               </label>
               <input
                 id="meetingCode"
