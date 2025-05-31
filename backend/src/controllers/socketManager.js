@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 export const connectToSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "*", //only in development environment
+      origin: "https://linkify-ecru.vercel.app/", 
       methods: ["GET", "POST"],
       allowedHeaders: ["*"],
       credentials: true,
