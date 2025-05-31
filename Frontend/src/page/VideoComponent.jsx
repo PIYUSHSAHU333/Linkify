@@ -14,6 +14,7 @@ import styles from "../Styles/VideoComponent.module.css";
 import io from "socket.io-client";
 import withAuth from "../utils/withAuth";
 import { Input } from "postcss";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import useMediaQuery from '@mui/material/useMediaQuery';
 var connections = {};
@@ -625,7 +626,9 @@ function VideoMeetingComponent() {
         </div>
         {askForUsername === true ? (
           <div className={styles.usernameModal}>
+            
             <div className={styles.modalContent}>
+              <Link className="div text-2xl md:text-4xl cursor-pointer pl-4 md:pl-14 font-bold text-amber-50" onClick={()=>{window.location.href="/"}}>Linkify</Link>
               <div className={styles.previewVideo}>
                 <video
                   ref={previewVideoRef}

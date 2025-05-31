@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 function Authentication() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -37,6 +38,9 @@ function Authentication() {
         }, 5000)
         setPassword("");
         setError("")
+        setTimeout(()=>{
+          setError("")
+        }, 5000)
         setFormState(0)
       }
     } catch (err) {
@@ -65,7 +69,10 @@ function Authentication() {
   };
 
   return (
-    <div className="authentication text-center flex items-center justify-center h-screen">
+    <div className=" authentication p-3">
+    <Link className="div text-2xl md:text-4xl cursor-pointer pl-4 md:pl-14 font-bold text-amber-50" to={"/"}>Linkify</Link>
+    <div className=" text-center flex items-center justify-center h-screen">
+     
       <form class="form_container">
         <div class="logo_container"></div>
         <div class={` title_container`}>
@@ -231,6 +238,7 @@ function Authentication() {
           {snackbar}
         </div>
       )}
+    </div>
     </div>
   );
 }
