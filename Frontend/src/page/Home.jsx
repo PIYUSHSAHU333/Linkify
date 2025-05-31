@@ -67,13 +67,13 @@ function Home() {
           <div className="name pl-14 text-4xl font-bold">Linkify</div>
         </RouteLink>
         <div className="navLink pr-14 flex justify-evenly gap-9 items-center">
-          <Link
+          <div
             onClick={() => {
               setHistoryOpen(!historyOpen);
             }}
           >
             <HistoryIcon /> History
-          </Link>
+          </div>
           <Link to="Footer" smooth={true} duration={700}>
             Contact
           </Link>
@@ -103,14 +103,14 @@ function Home() {
             className={`mobile-layout cursor-pointer sm:hidden  absolute top-14 right-2`}
           >
             <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-lg w-44 py-2 px-4 mt-2.5 flex flex-col ">
-              <Link
+              <div
                 className="text-xl text-amber-100 p-2"
                 onClick={() => {
                   setHistoryOpen(!historyOpen);
                 }}
               >
                 <HistoryIcon /> History
-              </Link>
+              </div>
               <Link
                 to="Footer"
                 className="text-xl text-amber-100 p-2"
