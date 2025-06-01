@@ -213,7 +213,7 @@ function VideoMeetingComponent() {
   };
 
   let connectToSocketServer = async () => {
-    socketRef.current = io.connect("http://localhost:8080", { secure: false }); //represents client side socket connection (current)
+    socketRef.current = io.connect("https://linkify-ecru.vercel.app", { secure: false }); //represents client side socket connection (current)
 
     socketRef.current.on("signal", gotMsgFromServer);
 
