@@ -14,7 +14,7 @@ app.get("/", async (req, res) => {
   res.json({ hello: "world" });
 });
 const corsOption = {
-  origin: "https://linkify-ecru.vercel.app",
+  origin: ["https://linkify-ecru.vercel.app", "https://linkify-ecru.vercel.app/"],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
