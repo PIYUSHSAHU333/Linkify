@@ -55,10 +55,12 @@ function Home() {
 
   // New useEffect to close history when hamburger menu closes
   useEffect(() => {
+    // Only run this effect when the menu closes
     if (!isOpen && historyOpen) {
+      console.log("Closing history because menu closed");
       setHistoryOpen(false);
     }
-  }, [isOpen, historyOpen]); // Dependencies: isOpen and historyOpen
+  }, [isOpen]); // Dependency: only isOpen
 
   return (
     <div className="homeComp md:overflow-y-auto  overflow-x-hidden flex flex-col min-h-screen">
@@ -68,8 +70,11 @@ function Home() {
         </RouteLink>
         <div className="navLink pr-14 flex justify-evenly gap-9 items-center">
           <div
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent click event from bubbling up
+              console.log("Desktop History clicked, historyOpen before:", historyOpen);
               setHistoryOpen(!historyOpen);
+              console.log("Desktop History clicked, historyOpen after:", historyOpen);
             }}
           >
             <HistoryIcon /> History
@@ -105,8 +110,11 @@ function Home() {
             <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-lg w-44 py-2 px-4 mt-2.5 flex flex-col ">
               <div
                 className="text-xl text-amber-100 p-2"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent click event from bubbling up
+                  console.log("Mobile History clicked, historyOpen before:", historyOpen);
                   setHistoryOpen(!historyOpen);
+                  console.log("Mobile History clicked, historyOpen after:", historyOpen);
                 }}
               >
                 <HistoryIcon /> History
